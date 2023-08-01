@@ -1,0 +1,48 @@
+#
+# This file was created by Xilinx Vitis tool.
+#
+
+-include fname.mk
+
+#
+# tools
+#
+
+RM = rm -f
+RMDIR = rm -rf
+
+
+
+#
+# variables
+#
+
+SDCARD_GEN = sdcard_gen
+GENERATE_BIF = ::scw::generate_bif
+
+XPFM_PATH = ../../zed/export/zed/zed.xpfm
+SYS_CONFIG = zed
+DOMAINS = standalone_ps7_cortexa9_0,app_core1
+BIF_PATH = ../../$(FUNCTION_NAME)_multicore_system/Debug/system.bif
+
+SD_FILES = --elf ../../$(FUNCTION_NAME)_core0/Debug/$(FUNCTION_NAME)_core0.elf,ps7_cortexa9_0 --elf ../../$(FUNCTION_NAME)_core1/Debug/$(FUNCTION_NAME)_core1.elf,ps7_cortexa9_1
+
+#
+# primary build targets
+#
+
+package:
+	-@echo Generating bif file for the system project
+	generate_system_bif.bat 54395 ${XPFM_PATH} ${DOMAINS} ${BIF_PATH}
+	${SDCARD_GEN} --xpfm ${XPFM_PATH} --sys_config ${SYS_CONFIG} --bif ${BIF_PATH} --no_bitstream ${SD_FILES}
+
+clean:
+	$(RMDIR) ./_sds
+	${RMDIR} package
+	${RM} system.bif
+
+.PHONY: all package clean
+
+all: package
+
+

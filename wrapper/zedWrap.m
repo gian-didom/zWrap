@@ -21,38 +21,7 @@ projectDir = what(coder_project_path);
 coder_project_path = projectDir.path;
 
 %% Parse inputs
-paramsNameValue = {'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
-paramsDefaultValues = {'192.168.1.10', '8', '7', 'NaN', '2000', '115200'};
-paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
-
-% Initialize structure
-for j=1:numel(paramsNameValue)
-    fname = paramsNameValue{j};
-    zSettings.(fname) = paramsDefaultValues{j};
-end
-
-for j=1:numel(paramsTrigger)
-    fname = paramsTrigger{j};
-    zSettings.(fname) = false;
-end
-
-% Parse inputs
-isParsing = false;
-for j=1:numel(varargin)
-    if any(strcmp(varargin{j}(2:end), paramsNameValue))
-        zSettings.(varargin{j}(2:end)) = varargin{j+1};
-        isParsing = true;
-    elseif any(strcmp(varargin{j}(2:end), paramsTrigger))
-        zSettings.(varargin{j}(2:end)) = true; 
-    else
-        if isParsing
-            isParsing = false;
-        else
-            error('Unrecognized option %s', varargin{j});
-        end
-    end
-end
-
+zSettings = parsezArgs(varargin);
 
 %% LOAD INFO FILES
 

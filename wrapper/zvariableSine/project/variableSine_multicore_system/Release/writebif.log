@@ -1,0 +1,30 @@
+TRACE::2023-07-03.17:22:37::SCWBifWriter::Found the complete platform C:/Users/gianfry/passinputs_dualcore/zed/export/zed/zed.xpfm
+TRACE::2023-07-03.17:22:38::SCWBifWriter::hardware databse : design_1_wrapper_2
+TRACE::2023-07-03.17:22:38::SCWBifWriter::No bitstream found in the design
+TRACE::2023-07-03.17:22:38::SCWBifWriter::Found a baremetal domain, proc: ps7_cortexa9_0
+TRACE::2023-07-03.17:22:38::SCWBifWriter::Found a baremetal domain, proc: ps7_cortexa9_1
+TRACE::2023-07-03.17:22:38::SCWBifWriter::proc type : 
+TRACE::2023-07-03.17:22:38::SCWBifWriter::proc[0] : ps7_cortexa9_0
+TRACE::2023-07-03.17:22:38::SCWBifWriter::Device type is : zynq
+TRACE::2023-07-03.17:22:38::SCWBifWriter::Writing BIF to file : C:/Users/gianfry/passinputs_dualcore/app_multicore_system/Debug/system.bif
+TRACE::2023-07-03.17:22:38::SCWBifWriter::Writing the Zynq Baremetal bif 
+TRACE::2023-07-04.12:20:13::SCWBifWriter::Found the complete platform C:/Users/gianfry/passinputs_dualcore/zed/export/zed/zed.xpfm
+TRACE::2023-07-04.12:20:14::SCWBifWriter::hardware databse : design_1_wrapper_2
+TRACE::2023-07-04.12:20:14::SCWBifWriter::No bitstream found in the design
+TRACE::2023-07-04.12:20:14::SCWBifWriter::Found a baremetal domain, proc: ps7_cortexa9_0
+TRACE::2023-07-04.12:20:14::SCWBifWriter::Found a baremetal domain, proc: ps7_cortexa9_1
+TRACE::2023-07-04.12:20:14::SCWBifWriter::proc type : 
+TRACE::2023-07-04.12:20:14::SCWBifWriter::proc[0] : ps7_cortexa9_0
+TRACE::2023-07-04.12:20:14::SCWBifWriter::Device type is : zynq
+TRACE::2023-07-04.12:20:14::SCWBifWriter::Writing BIF to file : C:/Users/gianfry/passinputs_dualcore/app_multicore_system/Debug/system.bif
+TRACE::2023-07-04.12:20:14::SCWBifWriter::Writing the Zynq Baremetal bif 
+TRACE::2023-07-04.14:06:46::SCWBifWriter::Found the complete platform C:/Users/gianfry/passinputs_dualcore/zed/export/zed/zed.xpfm
+TRACE::2023-07-04.14:06:47::SCWBifWriter::hardware databse : design_1_wrapper_2
+TRACE::2023-07-04.14:06:47::SCWBifWriter::No bitstream found in the design
+TRACE::2023-07-04.14:06:47::SCWBifWriter::Found a baremetal domain, proc: ps7_cortexa9_0
+TRACE::2023-07-04.14:06:47::SCWBifWriter::Found a baremetal domain, proc: ps7_cortexa9_1
+TRACE::2023-07-04.14:06:47::SCWBifWriter::proc type : 
+TRACE::2023-07-04.14:06:47::SCWBifWriter::proc[0] : ps7_cortexa9_0
+TRACE::2023-07-04.14:06:47::SCWBifWriter::Device type is : zynq
+TRACE::2023-07-04.14:06:47::SCWBifWriter::Writing BIF to file : C:/Users/gianfry/passinputs_dualcore/app_multicore_system/Debug/system.bif
+TRACE::2023-07-04.14:06:47::SCWBifWriter::Writing the Zynq Baremetal bif 

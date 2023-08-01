@@ -1,0 +1,29 @@
+2023-07-04T14:09:52.683752200255-14:09:52 **** Incremental Build of configuration Debug for project helloworld_core1 ****
+000-make all 
+000-make --no-print-directory pre-build
+000-a9-linaro-pre-build-step
+000-' '
+000-make --no-print-directory main-build
+000-'Building file: ../src/call_application.c'
+000-'Invoking: ARM v7 gcc compiler'
+000-arm-none-eabi-gcc -Wall -O0 -g3 -I"C:\Users\gianfry\passinputs_dualcore\helloworld_multicore_system\include_common" -c -fmessage-length=0 -MT"src/call_application.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -IC:/Users/gianfry/passinputs_dualcore/zed/export/zed/sw/zed/helloworld_core1/bspinclude/include -MMD -MP -MF"src/call_application.d" -MT"src/call_application.o" -o "src/call_application.o" "../src/call_application.c"
+000-../src/call_application.c: In function 'call_application':
+000/helloworld_core1/src/call_application.c14-1-1implicit declaration of function 'simple_sum' [-Wimplicit-function-declaration]1-../src/call_application.c:14:11: warning: implicit declaration of function 'simple_sum' [-Wimplicit-function-declaration]
+000-   14 | output1 = simple_sum(input1, input2);
+000-      |           ^~~~~~~~~~
+000-'Finished building: ../src/call_application.c'
+000-' '
+000-'Building target: helloworld_core1.elf'
+000-'Invoking: ARM v7 gcc linker'
+000-arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -LC:/Users/gianfry/passinputs_dualcore/zed/export/zed/sw/zed/helloworld_core1/bsplib/lib -o "helloworld_core1.elf"  ./src/application.o ./src/call_application.o ./src/helloworld_core1.o ./src/platform.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+000-'Finished building target: helloworld_core1.elf'
+000-' '
+000-'Invoking: ARM v7 Print Size'
+000-arm-none-eabi-size helloworld_core1.elf  |tee "helloworld_core1.elf.size"
+000-   text	   data	    bss	    dec	    hex	filename
+000-  52071	   2552	  22648	  77271	  12dd7	helloworld_core1.elf
+000-'Finished building: helloworld_core1.elf.size'
+000-' '
+00255-
+14:09:54 Build Finished (took 2s.280ms)
+
