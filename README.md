@@ -7,6 +7,7 @@ These are the prerequisites to use zWrap:
 
 * MATLAB and MATLAB Coder
 * **GNU make** to compile the generated files
+* **ARM Compiler** available from ARM official website.
 * **bootgen**, available from [the original open-source repository[^1]](https://github.com/Xilinx/bootgen), to generate the BOOT.bin image to put on the SD card
 
 [^1]: Boogen is listed as available only for Windows and Linux; however, it is possible to compile it also for MacOS systems.
