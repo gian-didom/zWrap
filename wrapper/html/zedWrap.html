@@ -1,0 +1,1849 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>zedWrap</title><meta name="generator" content="MATLAB 9.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2023-07-31"><meta name="DC.source" content="zedWrap.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">TODO: Alternative, give CodeInfo and then base everything on that directory</a></li><li><a href="#4">Parse inputs</a></li><li><a href="#5">LOAD INFO FILES</a></li><li><a href="#6">GET INPUT OBJECT</a></li><li><a href="#7">RETRIEVE INPUT AND OUTPUT INFORMATION</a></li><li><a href="#8">GENERATE PROJECT FOLDER</a></li><li><a href="#9">GENERATE INPUT STREAM PARSER</a></li><li><a href="#10">GENERATE BOARD BUILD</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [outputArg1,outputArg2] = zedWrap(varargin)
+</pre><pre class="codeinput"><span class="keyword">global</span> zSettings
+<span class="comment">%UNTITLED Summary of this function goes here</span>
+<span class="comment">%   Detailed explanation goes here</span>
+addpath(genpath(<span class="string">'classes'</span>));
+addpath(genpath(<span class="string">'functions'</span>));
+
+fprintbf(<span class="string">"Checking dependencies...\n"</span>);
+</pre><pre class="codeoutput">&lt;strong&gt;Checking dependencies...
+&lt;/strong&gt;</pre><h2 id="3">TODO: Alternative, give CodeInfo and then base everything on that directory</h2><pre class="codeinput">coder_project_path = <span class="string">'/Users/gianfry/Documents/DART/Code/Pillar2/COLTO/New Version/codegen/lib/convexGuidanceAlgorithmSimple'</span>
+coder_project_path = <span class="string">'/Users/gianfry/Documents/DART/Code/Playground/variableCoder/variableSum/codegen/lib/variableSum'</span>
+coder_project_path = <span class="string">'mexStreamer/codegen/lib/genericFunctionWrapper'</span>
+coder_project_path = <span class="string">'/Users/gianfry/Documents/DART/Code/Playground/variableCoder/structInput/codegen/lib/structinput'</span>
+coder_project_path = <span class="string">'/Users/gianfry/Documents/Code/ONNX2HDL/codegen/lib/predictDD'</span>
+coder_project_path = <span class="string">'/Users/gianfry/Documents/DLR/ZedWrapper/tests/findCentroidsDD/codegen/lib/findCentroidsDD'</span>
+coder_project_path = <span class="string">'test/mexStreamer/codegen/lib/genericFunction'</span>
+coder_project_path = <span class="string">'/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine'</span>
+
+projectDir = what(coder_project_path);
+coder_project_path = projectDir.path;
+</pre><pre class="codeoutput">
+coder_project_path =
+
+    '/Users/gianfry/Documents/DART/Code/Pillar2/COLTO/New Version/codegen/lib/convexGuidanceAlgorithmSimple'
+
+
+coder_project_path =
+
+    '/Users/gianfry/Documents/DART/Code/Playground/variableCoder/variableSum/codegen/lib/variableSum'
+
+
+coder_project_path =
+
+    'mexStreamer/codegen/lib/genericFunctionWrapper'
+
+
+coder_project_path =
+
+    '/Users/gianfry/Documents/DART/Code/Playground/variableCoder/structInput/codegen/lib/structinput'
+
+
+coder_project_path =
+
+    '/Users/gianfry/Documents/Code/ONNX2HDL/codegen/lib/predictDD'
+
+
+coder_project_path =
+
+    '/Users/gianfry/Documents/DLR/ZedWrapper/tests/findCentroidsDD/codegen/lib/findCentroidsDD'
+
+
+coder_project_path =
+
+    'test/mexStreamer/codegen/lib/genericFunction'
+
+
+coder_project_path =
+
+    '/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine'
+
+</pre><h2 id="4">Parse inputs</h2><pre class="codeinput">paramsNameValue = {<span class="string">'ip'</span>, <span class="string">'udpport'</span>, <span class="string">'tcpport'</span>, <span class="string">'stack'</span>, <span class="string">'heap'</span>, <span class="string">'baud'</span>};
+paramsDefaultValues = {<span class="string">'192.168.1.10'</span>, <span class="string">'8'</span>, <span class="string">'7'</span>, <span class="string">'NaN'</span>, <span class="string">'2000'</span>, <span class="string">'115200'</span>};
+paramsTrigger = {<span class="string">'limstack'</span>, <span class="string">'async'</span>, <span class="string">'async2'</span>, <span class="string">'rt'</span>, <span class="string">'unprotect'</span>, <span class="string">'debug'</span>, <span class="string">'y'</span>, <span class="string">'no_ocm'</span>, <span class="string">'pack'</span>};
+
+<span class="comment">% Initialize structure</span>
+<span class="keyword">for</span> j=1:numel(paramsNameValue)
+    fname = paramsNameValue{j};
+    zSettings.(fname) = paramsDefaultValues{j};
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> j=1:numel(paramsTrigger)
+    fname = paramsTrigger{j};
+    zSettings.(fname) = false;
+<span class="keyword">end</span>
+
+<span class="comment">% Parse inputs</span>
+isParsing = false;
+<span class="keyword">for</span> j=1:numel(varargin)
+    <span class="keyword">if</span> any(strcmp(varargin{j}(2:end), paramsNameValue))
+        zSettings.(varargin{j}(2:end)) = varargin{j+1};
+        isParsing = true;
+    <span class="keyword">elseif</span> any(strcmp(varargin{j}(2:end), paramsTrigger))
+        zSettings.(varargin{j}(2:end)) = true;
+    <span class="keyword">else</span>
+        <span class="keyword">if</span> isParsing
+            isParsing = false;
+        <span class="keyword">else</span>
+            error(<span class="string">'Unrecognized option %s'</span>, varargin{j});
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="5">LOAD INFO FILES</h2><pre class="codeinput">fprintbf(<span class="string">'Loading coded project information...'</span>);
+buildInfoStruct = load(fullfile(coder_project_path, <span class="string">'buildInfo.mat'</span>));
+codeInfoStruct = load(fullfile(coder_project_path, <span class="string">'codeInfo.mat'</span>));
+compileInfoStruct = load(fullfile(coder_project_path, <span class="string">'compileInfo.mat'</span>));
+
+buildInfo = buildInfoStruct.buildInfo;
+codeInfo = codeInfoStruct.codeInfo;
+printDone();
+
+<span class="comment">% Create packNGo including all headers</span>
+fprintbf(<span class="string">'Packing code including all headers... '</span>);
+zipName = fullfile(coder_project_path, <span class="keyword">...</span>
+    strcat(buildInfo.ComponentName, <span class="string">".zip"</span>));
+packDir = fullfile(coder_project_path, <span class="string">'pack'</span>);
+
+<span class="keyword">if</span> (exist(packDir, <span class="string">'dir'</span>))
+    rmdir(packDir, <span class="string">'s'</span>);
+<span class="keyword">end</span>
+packNGo(fullfile(coder_project_path, <span class="string">'buildInfo.mat'</span>), <span class="keyword">...</span>
+    <span class="string">'minimalHeaders'</span>, false, <span class="keyword">...</span>
+    <span class="string">'fileName'</span>, zipName);
+unzip(zipName, packDir);
+fprintbf(<span class="string">'All code succesfully packed in %s'</span>, packDir);
+printDone();
+</pre><pre class="codeoutput">&lt;strong&gt;Loading coded project information...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;&lt;strong&gt;Packing code including all headers... &lt;/strong&gt;&lt;strong&gt;All code succesfully packed in /Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine/pack&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;</pre><h2 id="6">GET INPUT OBJECT</h2><pre class="codeinput">fprintbf(<span class="string">'Building interface structure objects...'</span>);
+
+iss = fullInterfaceStructure(codeInfo, <span class="string">'input'</span>);
+iss.getTotalSize();
+iss.getTotalSizePadded();
+iss.printTree();
+fprintf(<span class="string">'\n\n\n'</span>);
+oss = fullInterfaceStructure(codeInfo, <span class="string">'output'</span>);
+oss.getTotalSize();
+oss.getTotalSizePadded()
+oss.printTree();
+printDone();
+
+<span class="comment">% Get padding thanks to  GDB</span>
+fprintbf(<span class="string">'Compiling and checking with gcc...\n'</span>);
+</pre><pre class="codeoutput">&lt;strong&gt;Building interface structure objects...&lt;/strong&gt;
+&lt;strong&gt;FULL_INPUT_STRUCTURE&lt;/strong&gt; [] &lt;struct&gt;
+   |
+   |--&lt;strong&gt;omega&lt;/strong&gt; [omega] &lt;real_T (double)&gt;
+   |
+   |--&lt;strong&gt;t&lt;/strong&gt; [t] &lt;real_T (double)&gt;
+
+
+
+
+ans =
+
+    16
+
+
+&lt;strong&gt;FULL_OUTPUT_STRUCTURE&lt;/strong&gt; [] &lt;struct&gt;
+   |
+   |--&lt;strong&gt;result&lt;/strong&gt; [result] &lt;real_T (double)&gt;
+   |
+   |--&lt;strong&gt;success&lt;/strong&gt; [success] &lt;real_T (double)&gt;
+&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;&lt;strong&gt;Compiling and checking with gcc...
+&lt;/strong&gt;</pre><h2 id="7">RETRIEVE INPUT AND OUTPUT INFORMATION</h2><pre class="codeinput">fprintbf(<span class="string">'Analyzing function inputs...\n'</span>);
+[numInputs, nameInputs, typeInputs, sizeInputs] = getNumberOfInputs(codeInfo);       <span class="comment">% Inputs</span>
+printDone();
+
+fprintbf(<span class="string">'Analyzing function outputs...\n'</span>);
+[numOutputs, nameOutputs, typeOutputs, sizeOutputs] = getNumberOfOutputs(codeInfo);   <span class="comment">% Outputs</span>
+printDone();
+
+codedInputs = arrayfun(@(a,b,c) struct(<span class="string">'name'</span>, a, <span class="string">'type'</span>, b', <span class="string">'size'</span>, c), <span class="keyword">...</span>
+    nameInputs, typeInputs, sizeInputs);
+codedOutputs = arrayfun(@(a,b,c) struct(<span class="string">'name'</span>, a, <span class="string">'type'</span>, b', <span class="string">'size'</span>, c), <span class="keyword">...</span>
+    nameOutputs, typeOutputs, sizeOutputs);
+
+echo = false;
+[GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, codedOutputs, packDir, echo);
+
+
+assert(GCCInputSize == iss.getTotalSizePadded(), <span class="string">"Error: input size mismatch. Try again with the --pack option."</span>);
+fprintbf(<span class="string">'&#10003; Input size check successful.\n'</span>);
+assert(GCCOutputSize == oss.getTotalSizePadded(), <span class="string">"Error: output size mismatch. Try again with the --pack option."</span>);
+fprintbf(<span class="string">'&#10003; Output size check successful.\n'</span>);
+
+<span class="comment">% Note: this size accounts for inter-struct alignment;</span>
+<span class="comment">% however, for readability purposes, everything will then be packed in a</span>
+<span class="comment">% big INPUT_STRUCT that could be slightly bigger for alignment purposes.</span>
+</pre><pre class="codeoutput">&lt;strong&gt;Analyzing function inputs...
+&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;&lt;strong&gt;Analyzing function outputs...
+&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;Running /opt/homebrew/bin/arm-none-eabi-g++ -I "/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine/pack" -c getSizeAndOffsetsGDB.cpp -o getSizeAndOffsetsGDB.o -g
+Running /opt/homebrew/bin/arm-none-eabi-gdb -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit
+&lt;strong&gt;&#10003; Input size check successful.
+&lt;/strong&gt;&lt;strong&gt;&#10003; Output size check successful.
+&lt;/strong&gt;</pre><h2 id="8">GENERATE PROJECT FOLDER</h2><pre class="codeinput">fprintbf(<span class="string">'Generating project folder...\n'</span>);
+targetFolderName = sprintf(<span class="string">"z%s"</span>, iss.fcnName);
+
+
+<span class="comment">% 1. Create project folder</span>
+<span class="keyword">if</span> exist(targetFolderName, <span class="string">'dir'</span>)
+     <span class="keyword">if</span> zSettings.y
+        usrInput = <span class="string">'y'</span>;
+     <span class="keyword">else</span>
+         usrInput = input(sprintf(<span class="string">"&lt;strong&gt;Folder %s already exists, overwrite?&lt;/strong&gt; [Y/n/k] [k]\n"</span>, <span class="keyword">...</span>
+        targetFolderName), <span class="string">"s"</span>);
+     <span class="keyword">end</span>
+
+
+    <span class="keyword">switch</span> usrInput
+
+        <span class="keyword">case</span> {<span class="string">'Y'</span>, <span class="string">'y'</span>}
+            warning(<span class="string">'off'</span>, <span class="string">'MATLAB:rmpath:DirNotFound'</span>);
+            rmpath(genpath(targetFolderName))
+            rmdir(targetFolderName, <span class="string">'s'</span>)
+            warning(<span class="string">'on'</span>, <span class="string">'MATLAB:rmpath:DirNotFound'</span>);
+
+        <span class="keyword">case</span> {<span class="string">'K'</span>, <span class="string">'k'</span>, <span class="string">''</span>}
+            new_targetFolderName = targetFolderName;
+            j=1;
+            <span class="keyword">while</span> exist(new_targetFolderName, <span class="string">"dir"</span>)
+                new_targetFolderName = sprintf(<span class="string">"%s%i"</span>, targetFolderName, j);
+                j = j+1;
+            <span class="keyword">end</span>
+            targetFolderName = new_targetFolderName;
+
+        <span class="keyword">otherwise</span>
+            fprintf(<span class="string">"Aborting."</span>);
+            <span class="keyword">return</span>
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+mkdir(targetFolderName);
+mkdir(fullfile(targetFolderName, <span class="string">"generated"</span>));
+mkdir(fullfile(targetFolderName, <span class="string">"simulink"</span>));
+mkdir(fullfile(targetFolderName, <span class="string">"project"</span>));
+
+addpath(genpath(targetFolderName));
+fprintbf(<span class="string">"Project folder generated at %s\n"</span>, targetFolderName);
+</pre><pre class="codeoutput">&lt;strong&gt;Generating project folder...
+&lt;/strong&gt;&lt;strong&gt;Project folder generated at zvariableSine
+&lt;/strong&gt;</pre><h2 id="9">GENERATE INPUT STREAM PARSER</h2><p>The inputs should be mapped in the shared memory region.</p><pre class="codeinput">fprintbf(<span class="string">'Generating input stream encoding and test function...'</span>);
+iss.generateMATLABFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_in.m'</span>));
+iss.generateDecoderFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_in_test.m'</span>));
+printDone();
+
+fprintbf(<span class="string">'Generating output stream decoding and test function...'</span>);
+oss.generateDecoderFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_out.m'</span>));
+oss.generateMATLABFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_out_test.m'</span>));
+printDone();
+
+fprintbf(<span class="string">'Generating C++ memory structure mapping header...'</span>);
+generateCppMemoryMapping(iss, oss, fullfile(targetFolderName, <span class="string">'generated'</span>, <span class="string">'memorymap.h'</span>));
+printDone();
+
+fprintbf(<span class="string">'Generating C++ entry point header and function...'</span>);
+generateCppCallTemplate(iss, oss, fullfile(targetFolderName, <span class="string">'generated'</span>, <span class="string">'callFunction.c'</span>));
+generateCppCallHeader(iss, oss, fullfile(targetFolderName, <span class="string">'generated'</span>, <span class="string">'callFunction.h'</span>));
+printDone();
+</pre><pre class="codeoutput">&lt;strong&gt;Generating input stream encoding and test function...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;&lt;strong&gt;Generating output stream decoding and test function...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;&lt;strong&gt;Generating C++ memory structure mapping header...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;&lt;strong&gt;Generating C++ entry point header and function...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
+&lt;/strong&gt;</pre><h2 id="10">GENERATE BOARD BUILD</h2><pre class="codeinput">boardName = <span class="string">'zedboard'</span>;
+rmpath(genpath(<span class="string">'boards'</span>));
+addpath(genpath(fullfile(<span class="string">'boards'</span>, boardName)));
+buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
+
+<span class="comment">% 8. Move the calling function template to the proper directory</span>
+
+fprintbf(<span class="string">'Customizing linker script...\n'</span>);
+
+fprintbf(<span class="string">'Generating makefile for ARM-Core0...\n'</span>);
+fprintbf(<span class="string">'Generating makefile for ARM-Core1...\n'</span>);
+
+fprintbf(<span class="string">'Running makefile for ARM-Core0...\n'</span>);
+fprintbf(<span class="string">'Running makefile for ARM-Core1...\n'</span>);
+fprintbf(<span class="string">'.elf files succesfully generated!\n'</span>);
+fprintbf(<span class="string">'Generating boot image...\n'</span>);
+
+bootImagePath = fullfile(coder_project_path, <span class="string">'BOOT.bin'</span>);
+fprintbf(<span class="string">'BOOT.bin image succesfully generated at %s\n'</span>, bootImagePath);
+
+fprintbf(<span class="string">'Generating Simulink block...\n'</span>)
+fprintbf(<span class="string">'Generating Simulink library...\n'</span>)
+SimulinkLibraryPath = fullfile(targetFolderName, <span class="string">'simulink'</span>, sprintf(<span class="string">'%s.slx'</span>, iss.fcnName));
+generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
+fprintbf(<span class="string">'Simulink library succesfully created at %s!\n'</span>, SimulinkLibraryPath)
+
+clear <span class="string">zSettings</span>;
+fprintbf(<span class="string">'Process completed. Insert the SD card in the ZedBoard and run a Simulink test case with the provided block.\n'</span>)
+</pre><pre class="codeoutput">Warning: "/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards" not found in
+path. 
+Warning: "/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard" not
+found in path. 
+Warning: "/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/.metadata"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/.vscode"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/RemoteSystemsTempFiles"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/Debug"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/Debug/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/Release"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/Release/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/_ide"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/_ide/psinit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/src/slprj"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/src/slprj/sim"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/src/slprj/sim/varcache"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/src/slprj/sim/varcache/testIOeth"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core0/src/slprj/sim/varcache/testIOeth/tmwinternal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/Debug"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/Debug/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/Release"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/Release/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/_ide"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/_ide/psinit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_core1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/Debug"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/Debug/sd_card"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/Release"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/Release/sd_card"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/_ide"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/_ide/launch"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/_ide/scripts"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/include_common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/app_multicore_system/include_common/_ide"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed" not
+found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/hw"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/boot"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/qemu"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/arch"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/lwip"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/lwip/apps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/lwip/priv"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/lwip/prot"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/netif"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/netif/ppp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bspinclude/include/netif/ppp/polarssl"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bsplib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bsplib/lib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/qemu"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bspinclude"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bspinclude/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bsplib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bsplib/lib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/qemu"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/hw" not
+found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/logs"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/code"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/arch"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/lwip"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/lwip/apps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/lwip/priv"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/lwip/prot"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/netif"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/netif/ppp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/netif/ppp/polarssl"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/lib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/coresightps_dcc_v1_8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/coresightps_dcc_v1_8/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/cpu_cortexa9_v2_11"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/cpu_cortexa9_v2_11/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/ddrps_v1_2"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/ddrps_v1_2/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/devcfg_v3_7"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/devcfg_v3_7/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/dmaps_v2_8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/dmaps_v2_8/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/emacps_v3_18"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/emacps_v3_18/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/generic_v3_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/generic_v3_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/gpiops_v3_11"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/gpiops_v3_11/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib/ports"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib/ports/xilinx"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib/ports/xilinx/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib/ports/xilinx/include/arch"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib/ports/xilinx/include/netif"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/contrib/ports/xilinx/netif"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/api"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/altcp_tls"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/http"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/http/fs"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/http/fs/img"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/http/makefsdata"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/lwiperf"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/mdns"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/mqtt"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/netbiosns"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/smtp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/snmp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/sntp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/apps/tftp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/core"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/core/ipv4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/core/ipv6"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/compat"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/compat/posix"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/compat/posix/arpa"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/compat/posix/net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/compat/posix/sys"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/compat/stdc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/lwip"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/lwip/apps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/lwip/priv"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/lwip/prot"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/netif"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/netif/ppp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/include/netif/ppp/polarssl"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/netif"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/netif/ppp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/lwip213_v1_0/src/lwip-2.1.3/src/netif/ppp/polarssl"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/qspips_v3_10"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/qspips_v3_10/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/scugic_v5_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/scugic_v5_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/scutimer_v2_4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/scutimer_v2_4/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/scuwdt_v2_4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/scuwdt_v2_4/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/sdps_v4_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/sdps_v4_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/xpvxenconsole"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform/Versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9/armcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/platform/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/clocking"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/clocking"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/intr"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/intr"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/microblaze"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/profile"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/ttcps_v3_17"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/ttcps_v3_17/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/uartps_v3_12"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/uartps_v3_12/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/usbps_v2_7"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/usbps_v2_7/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/xadcps_v2_6"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_0/standalone_ps7_cortexa9_0/bsp/ps7_cortexa9_0/libsrc/xadcps_v2_6/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/code"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/lib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/coresightps_dcc_v1_8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/coresightps_dcc_v1_8/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/cpu_cortexa9_v2_11"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/cpu_cortexa9_v2_11/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/ddrps_v1_2"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/ddrps_v1_2/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/devcfg_v3_7"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/devcfg_v3_7/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/dmaps_v2_8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/dmaps_v2_8/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/emacps_v3_18"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/emacps_v3_18/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/generic_v3_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/generic_v3_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/gpiops_v3_11"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/gpiops_v3_11/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/qspips_v3_10"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/qspips_v3_10/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/scugic_v5_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/scugic_v5_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/scutimer_v2_4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/scutimer_v2_4/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/scuwdt_v2_4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/scuwdt_v2_4/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/sdps_v4_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/sdps_v4_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/32bit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/xpvxenconsole"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform/Versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/common/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/common/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/common/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexa9"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexa9/armcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexa9/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexa9/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/cortexr5/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/arm/platform/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/clocking"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/common/clocking"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/common/intr"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/common/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/common/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/intr"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/microblaze"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/profile"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/standalone_v8_1/src/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/ttcps_v3_17"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/ttcps_v3_17/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/uartps_v3_12"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/uartps_v3_12/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/usbps_v2_7"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/usbps_v2_7/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/xadcps_v2_6"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/ps7_cortexa9_1/standalone_ps7_cortexa9_1/bsp/ps7_cortexa9_1/libsrc/xadcps_v2_6/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/code"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/lib"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/coresightps_dcc_v1_8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/coresightps_dcc_v1_8/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/cpu_cortexa9_v2_11"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/cpu_cortexa9_v2_11/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/ddrps_v1_2"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/ddrps_v1_2/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/devcfg_v3_7"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/devcfg_v3_7/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/dmaps_v2_8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/dmaps_v2_8/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/emacps_v3_18"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/emacps_v3_18/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/generic_v3_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/generic_v3_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/gpiops_v3_11"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/gpiops_v3_11/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/qspips_v3_10"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/qspips_v3_10/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/scugic_v5_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/scugic_v5_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/scutimer_v2_4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/scutimer_v2_4/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/scuwdt_v2_4"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/scuwdt_v2_4/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/sdps_v4_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/sdps_v4_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/32bit/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/ZynqMP/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/platform/versal/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/64bit/xpvxenconsole"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform/Versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/ARMv8/includes_ps/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/common/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9/armcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexa9/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/armclang"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/gcc"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/iccarm"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/platform/ZynqMP"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/cortexr5/platform/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/platform"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/arm/platform/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/clocking"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/clocking"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/intr"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/common/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/intr"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/microblaze"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/profile"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/versal"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/standalone_v8_1/src/versal_net"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/ttcps_v3_17"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/ttcps_v3_17/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/uartps_v3_12"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/uartps_v3_12/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/usbps_v2_7"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/usbps_v2_7/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xadcps_v2_6"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xadcps_v2_6/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xilffs_v5_0"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xilffs_v5_0/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xilffs_v5_0/src/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xilrsa_v1_6"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xilrsa_v1_6/src"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/bsp/zed/zynq_fsbl/zynq_fsbl_bsp/ps7_cortexa9_0/libsrc/xilrsa_v1_6/src/include"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/matlab" not
+found in path. 
+Warning: "/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/slprj"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/slprj/sim" not
+found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/slprj/sim/varcache"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/slprj/sim/varcache/untitled1"
+not found in path. 
+Warning:
+"/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/boards/zedboard/slprj/sim/varcache/untitled1/tmwinternal"
+not found in path. 
+&lt;strong&gt;Customizing linker script...
+&lt;/strong&gt;&lt;strong&gt;Generating makefile for ARM-Core0...
+&lt;/strong&gt;&lt;strong&gt;Generating makefile for ARM-Core1...
+&lt;/strong&gt;&lt;strong&gt;Running makefile for ARM-Core0...
+&lt;/strong&gt;&lt;strong&gt;Running makefile for ARM-Core1...
+&lt;/strong&gt;&lt;strong&gt;.elf files succesfully generated!
+&lt;/strong&gt;&lt;strong&gt;Generating boot image...
+&lt;/strong&gt;&lt;strong&gt;BOOT.bin image succesfully generated at /Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine/BOOT.bin
+&lt;/strong&gt;&lt;strong&gt;Generating Simulink block...
+&lt;/strong&gt;&lt;strong&gt;Generating Simulink library...
+&lt;/strong&gt;</pre><pre class="codeoutput error">Unrecognized property 'SaveImageFileWithModel' for class 'Simulink.Mask'.
+
+Error in generateSimulinkLibrary (line 45)
+inputMask.SaveImageFileWithModel = 'on';
+
+Error in zedWrap (line 223)
+generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+
+<span class="keyword">function</span> printDone
+fprintbf(<span class="string">'\t&#10003; Done.\n'</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [outputArg1,outputArg2] = zedWrap(varargin)
+global zSettings
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+addpath(genpath('classes'));
+addpath(genpath('functions'));
+
+fprintbf("Checking dependencies...\n");
+
+%% TODO: Alternative, give CodeInfo and then base everything on that directory
+coder_project_path = '/Users/gianfry/Documents/DART/Code/Pillar2/COLTO/New Version/codegen/lib/convexGuidanceAlgorithmSimple'
+coder_project_path = '/Users/gianfry/Documents/DART/Code/Playground/variableCoder/variableSum/codegen/lib/variableSum'
+coder_project_path = 'mexStreamer/codegen/lib/genericFunctionWrapper'
+coder_project_path = '/Users/gianfry/Documents/DART/Code/Playground/variableCoder/structInput/codegen/lib/structinput'
+coder_project_path = '/Users/gianfry/Documents/Code/ONNX2HDL/codegen/lib/predictDD'
+coder_project_path = '/Users/gianfry/Documents/DLR/ZedWrapper/tests/findCentroidsDD/codegen/lib/findCentroidsDD'
+coder_project_path = 'test/mexStreamer/codegen/lib/genericFunction'
+coder_project_path = '/Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine'
+
+projectDir = what(coder_project_path);
+coder_project_path = projectDir.path;
+
+%% Parse inputs
+paramsNameValue = {'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
+paramsDefaultValues = {'192.168.1.10', '8', '7', 'NaN', '2000', '115200'};
+paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
+
+% Initialize structure
+for j=1:numel(paramsNameValue)
+    fname = paramsNameValue{j};
+    zSettings.(fname) = paramsDefaultValues{j};
+end
+
+for j=1:numel(paramsTrigger)
+    fname = paramsTrigger{j};
+    zSettings.(fname) = false;
+end
+
+% Parse inputs
+isParsing = false;
+for j=1:numel(varargin)
+    if any(strcmp(varargin{j}(2:end), paramsNameValue))
+        zSettings.(varargin{j}(2:end)) = varargin{j+1};
+        isParsing = true;
+    elseif any(strcmp(varargin{j}(2:end), paramsTrigger))
+        zSettings.(varargin{j}(2:end)) = true; 
+    else
+        if isParsing
+            isParsing = false;
+        else
+            error('Unrecognized option %s', varargin{j});
+        end
+    end
+end
+
+
+%% LOAD INFO FILES
+
+fprintbf('Loading coded project information...');
+buildInfoStruct = load(fullfile(coder_project_path, 'buildInfo.mat'));
+codeInfoStruct = load(fullfile(coder_project_path, 'codeInfo.mat'));
+compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
+
+buildInfo = buildInfoStruct.buildInfo;
+codeInfo = codeInfoStruct.codeInfo;
+printDone();
+
+% Create packNGo including all headers
+fprintbf('Packing code including all headers... ');
+zipName = fullfile(coder_project_path, ...
+    strcat(buildInfo.ComponentName, ".zip"));
+packDir = fullfile(coder_project_path, 'pack');
+
+if (exist(packDir, 'dir'))
+    rmdir(packDir, 's');
+end
+packNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
+    'minimalHeaders', false, ...
+    'fileName', zipName);
+unzip(zipName, packDir);
+fprintbf('All code succesfully packed in %s', packDir);
+printDone();
+
+
+%% GET INPUT OBJECT
+fprintbf('Building interface structure objects...');
+
+iss = fullInterfaceStructure(codeInfo, 'input');
+iss.getTotalSize();
+iss.getTotalSizePadded();
+iss.printTree();
+fprintf('\n\n\n');
+oss = fullInterfaceStructure(codeInfo, 'output');
+oss.getTotalSize();
+oss.getTotalSizePadded()
+oss.printTree();
+printDone();
+
+% Get padding thanks to  GDB
+fprintbf('Compiling and checking with gcc...\n');
+%% RETRIEVE INPUT AND OUTPUT INFORMATION
+fprintbf('Analyzing function inputs...\n');
+[numInputs, nameInputs, typeInputs, sizeInputs] = getNumberOfInputs(codeInfo);       % Inputs
+printDone();
+
+fprintbf('Analyzing function outputs...\n');
+[numOutputs, nameOutputs, typeOutputs, sizeOutputs] = getNumberOfOutputs(codeInfo);   % Outputs
+printDone();
+
+codedInputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
+    nameInputs, typeInputs, sizeInputs);
+codedOutputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
+    nameOutputs, typeOutputs, sizeOutputs);
+
+echo = false;
+[GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, codedOutputs, packDir, echo);
+
+
+assert(GCCInputSize == iss.getTotalSizePadded(), "Error: input size mismatch. Try again with the REPLACE_WITH_DASH_DASHpack option.");
+fprintbf('✓ Input size check successful.\n');
+assert(GCCOutputSize == oss.getTotalSizePadded(), "Error: output size mismatch. Try again with the REPLACE_WITH_DASH_DASHpack option.");
+fprintbf('✓ Output size check successful.\n');
+
+% Note: this size accounts for inter-struct alignment;
+% however, for readability purposes, everything will then be packed in a
+% big INPUT_STRUCT that could be slightly bigger for alignment purposes.
+
+%% GENERATE PROJECT FOLDER
+fprintbf('Generating project folder...\n');
+targetFolderName = sprintf("z%s", iss.fcnName);
+
+
+% 1. Create project folder
+if exist(targetFolderName, 'dir')
+     if zSettings.y 
+        usrInput = 'y';
+     else 
+         usrInput = input(sprintf("<strong>Folder %s already exists, overwrite?</strong> [Y/n/k] [k]\n", ...
+        targetFolderName), "s");
+     end
+
+
+    switch usrInput
+
+        case {'Y', 'y'}
+            warning('off', 'MATLAB:rmpath:DirNotFound');
+            rmpath(genpath(targetFolderName))
+            rmdir(targetFolderName, 's')
+            warning('on', 'MATLAB:rmpath:DirNotFound');
+            
+        case {'K', 'k', ''}
+            new_targetFolderName = targetFolderName;
+            j=1;
+            while exist(new_targetFolderName, "dir")
+                new_targetFolderName = sprintf("%s%i", targetFolderName, j);
+                j = j+1;
+            end
+            targetFolderName = new_targetFolderName;
+
+        otherwise
+            fprintf("Aborting.");
+            return
+    end
+
+end
+
+mkdir(targetFolderName);
+mkdir(fullfile(targetFolderName, "generated"));
+mkdir(fullfile(targetFolderName, "simulink"));
+mkdir(fullfile(targetFolderName, "project"));
+
+addpath(genpath(targetFolderName));
+fprintbf("Project folder generated at %s\n", targetFolderName);
+
+
+%% GENERATE INPUT STREAM PARSER
+% The inputs should be mapped in the shared memory region.
+
+fprintbf('Generating input stream encoding and test function...');
+iss.generateMATLABFunction(fullfile(targetFolderName, 'simulink', 'prova_in.m'));
+iss.generateDecoderFunction(fullfile(targetFolderName, 'simulink', 'prova_in_test.m'));
+printDone();
+
+fprintbf('Generating output stream decoding and test function...');
+oss.generateDecoderFunction(fullfile(targetFolderName, 'simulink', 'prova_out.m'));
+oss.generateMATLABFunction(fullfile(targetFolderName, 'simulink', 'prova_out_test.m'));
+printDone();
+
+fprintbf('Generating C++ memory structure mapping header...');
+generateCppMemoryMapping(iss, oss, fullfile(targetFolderName, 'generated', 'memorymap.h'));
+printDone();
+
+fprintbf('Generating C++ entry point header and function...');
+generateCppCallTemplate(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.c'));
+generateCppCallHeader(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.h'));
+printDone();
+
+
+%% GENERATE BOARD BUILD
+boardName = 'zedboard';
+rmpath(genpath('boards'));
+addpath(genpath(fullfile('boards', boardName)));
+buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
+
+% 8. Move the calling function template to the proper directory
+
+fprintbf('Customizing linker script...\n');
+
+fprintbf('Generating makefile for ARM-Core0...\n');
+fprintbf('Generating makefile for ARM-Core1...\n');
+
+fprintbf('Running makefile for ARM-Core0...\n');
+fprintbf('Running makefile for ARM-Core1...\n');
+fprintbf('.elf files succesfully generated!\n');
+fprintbf('Generating boot image...\n');
+
+bootImagePath = fullfile(coder_project_path, 'BOOT.bin');
+fprintbf('BOOT.bin image succesfully generated at %s\n', bootImagePath);
+
+fprintbf('Generating Simulink block...\n')
+fprintbf('Generating Simulink library...\n')
+SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', iss.fcnName));
+generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
+fprintbf('Simulink library succesfully created at %s!\n', SimulinkLibraryPath)
+
+clear zSettings;
+fprintbf('Process completed. Insert the SD card in the ZedBoard and run a Simulink test case with the provided block.\n')
+end
+
+function printDone
+fprintbf('\t✓ Done.\n');
+end
+##### SOURCE END #####
+--></body></html>
