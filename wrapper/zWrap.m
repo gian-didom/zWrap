@@ -1,4 +1,4 @@
-function [outputArg1,outputArg2] = zedWrap(varargin)
+function [outputArg1,outputArg2] = zWrap(varargin)
 global zSettings
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
@@ -7,25 +7,15 @@ addpath(genpath('functions'));
 
 fprintbf("Checking dependencies...\n");
 
-%% TODO: Alternative, give CodeInfo and then base everything on that directory
-coder_project_path = '/Users/gianfry/Documents/DART/Code/Pillar2/COLTO/New Version/codegen/lib/convexGuidanceAlgorithmSimple'
-coder_project_path = '/Users/gianfry/Documents/DART/Code/Playground/variableCoder/variableSum/codegen/lib/variableSum'
-coder_project_path = 'mexStreamer/codegen/lib/genericFunctionWrapper'
-coder_project_path = '/Users/gianfry/Documents/Code/ONNX2HDL/codegen/lib/predictDD'
-coder_project_path = 'test/mexStreamer/codegen/lib/genericFunction'
-coder_project_path = '/Users/gianfry/Documents/DLR/zWrap_recovery/tests/variableSine/codegen/lib/variableSine'
-coder_project_path = '/Users/gianfry/Documents/DLR/zWrap_recovery/tests/findCentroidsDD/codegen/lib/findCentroidsDD'
-coder_project_path = '/Users/gianfry/Documents/DLR/zWrap_recovery/wrapper/test/znpmwOFArn_fun/codegen/lib/znpmwOFArn_fun'
-coder_project_path = '/Users/gianfry/Documents/DART/Code/Playground/variableCoder/structInput/codegen/lib/structinput'
-coder_project_path = '/Users/gianfry/Documents/DLR/zWrap_recovery/wrapper/test/GLBdhJrRXN_fun/codegen/lib/GLBdhJrRXN_fun'
-coder_project_path = '/Users/gianfry/Documents/Code/ONNX2HDL/07_set/codegen/lib/findCentroids07set'
-coder_project_path = '/Users/gianfry/Documents/DART/Code/PugliattiONNX/051_CNNs_HW/02-Navigation/codegen/lib/predictMixed051'
 
-projectDir = what(coder_project_path);
-coder_project_path = projectDir.path;
 
 %% Parse inputs
 zSettings = parsezArgs(varargin{:});
+
+%% TODO: Alternative, give CodeInfo and then base everything on that directory
+coder_project_path = zSettings.path;
+projectDir = what(coder_project_path);
+coder_project_path = projectDir.path;
 
 %% LOAD INFO FILES
 

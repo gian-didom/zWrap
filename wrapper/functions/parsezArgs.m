@@ -24,8 +24,8 @@ function zSettings = parsezArgs(varargin)
 % * |pack|      - Use #pragma pack(1) to solve potential memory padding issues
 
 % 
-paramsNameValue = {'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
-paramsDefaultValues = {'192.168.1.10', '8', '7', '200000', '2000', '115200'};
+paramsNameValue = {'path', 'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
+paramsDefaultValues = {'none', '192.168.1.10', '8', '7', '200000', '2000', '115200'};
 paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
 
 % Initialize structure
@@ -55,6 +55,9 @@ for j=1:numel(varargin)
         end
     end
 end
+
+assert(isfield(zSettings, 'path'), "Path not provided. Please specify a path with the -path flag.");
+assert(exist(zSettings.path, 'dir'), "The specified path <strong>%s</strong> does not exist.", zSettings.path)
 
 % Fix stack size
 if strcmp(zSettings.stack(1:2), "0x")
