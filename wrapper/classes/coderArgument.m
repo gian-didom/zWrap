@@ -25,6 +25,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         memoryOffset = 0;
         Role = ''
         originalObject
+        Coder = 'MATLAB'
     end
 
     %% 
@@ -214,6 +215,8 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         % This is the factory function.
         function outobj = processObject2(inobj, varargin)
 
+   
+
             if isa(inobj, 'RTW.DataInterface')
                 % This block is executed in case the passed object is of
                 % type RTW.DataInterface. This kind of objects represent
@@ -223,11 +226,18 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                 impl = inobj.Implementation;
                 switch class(impl)
 
-                    case 'RTW.Variable'
+                    case {'RTW.Variable', 'RTW.StructExpression'}
+                        if isprop(impl, 'Identifier')
+                            idFieldName = 'Identifier';
+                        elseif isprop(impl, 'ElementIdentifier')
+                            idFieldName = 'ElementIdentifier';
+                        else
+                            error('No Identifier field in structure');
+                        end
                         outobj = coderArgument.processObject2(impl.Type);
                         % Augment with name information
-                        outobj.setName(impl.Identifier);
-                        outobj.MATLABName = impl.Identifier;
+                        outobj.setName(impl.(idFieldName));
+                        outobj.MATLABName = impl.(idFieldName);
 
                     case 'RTW.TypedCollection'
                         % This is split between two elements, but actually
@@ -255,8 +265,13 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                         outobj = coderNestedObject.create(inobj);
 
                     case 'coder.types.Matrix'
-                        % This is the matrix type
+                        % This is the matrix type, but for the 1x1 case it
+                        % collapses to a Primitive
+                        if all(inobj.Dimensions == 1)
+                            outobj = coderPrimitive(inobj.BaseType);
+                        else
                         outobj = coderFixedMatrix(inobj);
+                        end
 
                     otherwise
                         % This is a lower-level or an error

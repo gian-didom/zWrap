@@ -26,12 +26,11 @@ end
 % then using the arm-none-eabi-nm command, the size table is retrieved.
 
 sourceLines = cell(0,1);
-if isfile(fullfile(packDir, sprintf("%s_types.h", buildInfo.ComponentName)))
+
 sourceLines{end+1}  = sprintf("#include ""%s_types.h""\n\n", buildInfo.ComponentName);
-end
-sourceLines{end+1}  = sprintf("\n#ifndef RTWTYPES_H");
+sourceLines{end+1}  = sprintf("#ifndef RTWTYPES_H");
 sourceLines{end+1}  = sprintf("#include ""rtwtypes.h""\n\n");
-sourceLines{end+1}  = sprintf("#endif\n\n");
+sourceLines{end+1}  = sprintf("#endif");
 
 % Full input
 sourceLines{end+1} = sprintf("namespace coder {");

@@ -52,11 +52,19 @@ CppScript = vertcat(CppScript, ...
 CppScript = vertcat(CppScript, ...
     sprintf("// Call function"));
 call_prototype_name = sprintf("%s(", inputObj.fcnName);
-call_prototype_args = "";
 
 full_args = [inputObj.Children, outputObj.Children];
 
-call_prototype_args = {};
+switch (inputObj.Coder)
+    case 'Simulink'
+        call_prototype_args = {'0,'};
+
+        
+
+    case 'MATLAB'
+        call_prototype_args = {};
+
+end
 for j=1:numel(full_args)
 
     thisArg = {};

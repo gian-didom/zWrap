@@ -51,8 +51,7 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
             end
 
             for j=1:numel(obj.Children)
-                obj.Children(j).Coder = obj.Coder;
-            end
+                obj.Children.
 
             obj.AlignmentRequirement = max(arrayfun(@(x) x.AlignmentRequirement, obj.Children));
 
