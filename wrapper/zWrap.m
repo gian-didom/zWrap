@@ -191,6 +191,13 @@ SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', i
 generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
 fprintbf('Simulink library succesfully created at %s!\n', SimulinkLibraryPath)
 
+
+%% RUN TESTS
+
+% Test 1: hard-coded memory address is the one obtained from the Core 1
+% disassembly (needs .elf file compilation)
+
+%% CLEAR
 clear zSettings;
 fprintbf('Process completed. Insert the SD card in the ZedBoard and run a Simulink test case with the provided block.\n')
 end

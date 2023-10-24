@@ -29,6 +29,11 @@ sourceLines = cell(0,1);
 if isfile(fullfile(packDir, sprintf("%s_types.h", buildInfo.ComponentName)))
 sourceLines{end+1}  = sprintf("#include ""%s_types.h""\n\n", buildInfo.ComponentName);
 end
+
+if isfile(fullfile(packDir, sprintf("%s.h", buildInfo.ComponentName)))
+sourceLines{end+1}  = sprintf("#include ""%s.h""\n\n", buildInfo.ComponentName);
+end
+
 sourceLines{end+1}  = sprintf("\n#ifndef RTWTYPES_H");
 sourceLines{end+1}  = sprintf("#include ""rtwtypes.h""\n\n");
 sourceLines{end+1}  = sprintf("#endif\n\n");
