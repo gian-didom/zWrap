@@ -1,0 +1,8 @@
+/*zed*/
+the_ROM_image:
+{
+  [bootloader]<zed/boot/fsbl.elf>
+   <bitstream> 
+  <elf,ps7_cortexa9_0>
+  <elf,ps7_cortexa9_1>
+}
