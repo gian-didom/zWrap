@@ -21,8 +21,8 @@ args_struct = {};
 for j=1:numel(iss.Children)
     arg = iss.Children(j).getTemplate();
     if isstruct(arg)
-    args_struct{end+1} = arg;
-    Simulink.Bus.createObject(arg);
+        args_struct{end+1} = arg;
+        Simulink.Bus.createObject(arg);
     end
 end
 
@@ -37,7 +37,7 @@ delete_block(sprintf('%s/Out1', subsystem_path));
 %% Add input parser
 add_block('simulink/User-Defined Functions/MATLAB Function', sprintf('%s/inputSerializer', subsystem_path));
 config = get_param(sprintf("%s/inputSerializer", subsystem_path), 'MATLABFunctionConfiguration');
-config.FunctionScript = fileread(sprintf('z%s/simulink/prova_in.m', iss.fcnName));
+config.FunctionScript = fileread(sprintf('z%s/simulink/%s_inputSerializer.m', iss.fcnName, iss.fcnName));
 % Add mask
 inputMask = Simulink.Mask.create(sprintf('%s/inputSerializer', subsystem_path));
 inputMask.IconUnits = 'pixels';
@@ -50,7 +50,7 @@ inputMask.SaveImageFileWithModel = 'on';
 
 add_block('simulink/User-Defined Functions/MATLAB Function', sprintf('%s/outputParser', subsystem_path));
 config = get_param(sprintf("%s/outputParser", subsystem_path), 'MATLABFunctionConfiguration');
-config.FunctionScript = fileread(sprintf('z%s/simulink/prova_out.m', iss.fcnName));
+config.FunctionScript = fileread(sprintf('z%s/simulink/%s_outputParser.m', iss.fcnName, iss.fcnName));
 % Add mask
 
 % Set output size - because Simulink is really stupid
@@ -68,14 +68,14 @@ outputMask.SaveImageFileWithModel = 'on';
 % set_param('%s/outputParser', 'num')
 %% Add input ports
 for j=1:numel(iss.Children)
-    add_block('simulink/Sources/In1', sprintf('%s/%s', subsystem_path, iss.Children(j).MATLABName));
-    add_line(subsystem_path, sprintf('%s/1', iss.Children(j).MATLABName), sprintf('inputSerializer/%i', j));
+    add_block('simulink/Sources/In1', sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName));
+    add_line(subsystem_path, sprintf('in_%s/1', iss.Children(j).MATLABName), sprintf('inputSerializer/%i', j));
 end
 
 %% Add output ports
 for j=1:numel(oss.Children)
-    add_block('simulink/Sinks/Out1', sprintf('%s/%s', subsystem_path, oss.Children(j).MATLABName));
-    add_line(subsystem_path, sprintf('outputParser/%i', j), sprintf('%s/1', oss.Children(j).MATLABName));
+    add_block('simulink/Sinks/Out1', sprintf('%s/out_%s', subsystem_path, oss.Children(j).MATLABName));
+    add_line(subsystem_path, sprintf('outputParser/%i', j), sprintf('out_%s/1', oss.Children(j).MATLABName));
     % set_param(sprintf('%s/%s/1', oss.Children(j).MATLABName, j), 'PortDimensions', [2 3]);
 end
 
@@ -113,11 +113,11 @@ set_param(sprintf("%s/TCP Receive", subsystem_path), 'AttributesFormatString', "
 set_param(sprintf("%s/TCP Receive", subsystem_path), 'Priority', "2");
 
 if zSettings.async || zSettings.async2
-set_param(sprintf("%s/TCP Receive", subsystem_path), 'EnableBlockingMode', 'off');
-% TODO: Add conditions and blocks for async2 - retaning the old values.
+    set_param(sprintf("%s/TCP Receive", subsystem_path), 'EnableBlockingMode', 'off');
+    % TODO: Add conditions and blocks for async2 - retaning the old values.
 else
-set_param(sprintf("%s/TCP Receive", subsystem_path), 'Timeout', '1e10');
-set_param(sprintf("%s/TCP Receive", subsystem_path), 'SampleTime', '-1');
+    set_param(sprintf("%s/TCP Receive", subsystem_path), 'Timeout', '1e10');
+    set_param(sprintf("%s/TCP Receive", subsystem_path), 'SampleTime', '-1');
 
 end
 %% Add graphics, images, etc
@@ -171,33 +171,33 @@ pos_input_parser(4) = pos_input_parser(2) + max(40, 20*numel(iss.Children));
 set_param(sprintf('%s/inputSerializer', subsystem_path), 'Position', pos_input_parser);
 
 for j=1:numel(iss.Children)
-in_pos = get_param(sprintf('%s/%s', subsystem_path, iss.Children(j).MATLABName), 'Position');
-in_pos(1) = -80;
-if numel(iss.Children) == 1
-in_pos(2) = pos_tcp_send(2) + (j)*20 - 10;
-else
-in_pos(2) = pos_tcp_send(2) + (j-1)*20;
-end
-in_pos(3) = -50;
-in_pos(4) = in_pos(2) + 14;
-set_param(sprintf('%s/%s', subsystem_path, iss.Children(j).MATLABName), 'Position', in_pos);
+    in_pos = get_param(sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName), 'Position');
+    in_pos(1) = -80;
+    if numel(iss.Children) == 1
+        in_pos(2) = pos_tcp_send(2) + (j)*20 - 10;
+    else
+        in_pos(2) = pos_tcp_send(2) + (j-1)*20;
+    end
+    in_pos(3) = -50;
+    in_pos(4) = in_pos(2) + 14;
+    set_param(sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName), 'Position', in_pos);
 
 end
 
 
 for j=1:numel(oss.Children)
-out_pos = get_param(sprintf('%s/%s', subsystem_path, oss.Children(j).MATLABName), 'Position');
-out_pos(1) = 547;
+    out_pos = get_param(sprintf('%s/out_%s', subsystem_path, oss.Children(j).MATLABName), 'Position');
+    out_pos(1) = 547;
 
-if numel(oss.Children) == 1
-out_pos(2) = pos_tcp_receive(2) + (j)*20 - 10;
-else
-out_pos(2) = pos_tcp_receive(2) + (j-1)*20;
-end
+    if numel(oss.Children) == 1
+        out_pos(2) = pos_tcp_receive(2) + (j)*20 - 10;
+    else
+        out_pos(2) = pos_tcp_receive(2) + (j-1)*20;
+    end
 
-out_pos(3) = 577;
-out_pos(4) = out_pos(2) + 14;
-set_param(sprintf('%s/%s', subsystem_path, oss.Children(j).MATLABName), 'Position', out_pos);
+    out_pos(3) = 577;
+    out_pos(4) = out_pos(2) + 14;
+    set_param(sprintf('%s/out_%s', subsystem_path, oss.Children(j).MATLABName), 'Position', out_pos);
 
 end
 

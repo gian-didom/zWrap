@@ -48,15 +48,46 @@ CppScript = vertcat(CppScript, ...
     sprintf("outputStruct* pO = (outputStruct*) OUTPUTSTRUCT_BASE_ADDR;"));
 
 
+%% For SIMULINK: Initialization
+
+if strcmp(inputObj.Coder,"Simulink")
+    
+CppScript = vertcat(CppScript, ...
+    sprintf("if (!MODEL_INITIALIZED) {"));
+
+CppScript = vertcat(CppScript, ...
+    sprintf("MODEL_INITIALIZED = true;"));
+
+CppScript = vertcat(CppScript, ...
+    sprintf("RTM.dwork = &dwork;"));
+
+CppScript = vertcat(CppScript, ...
+    sprintf("%s_initialize(&RTM);", inputObj.headerName));
+
+CppScript = vertcat(CppScript, ...
+    sprintf("}"));
+
+end
+
+
+
+%%
+
 
 CppScript = vertcat(CppScript, ...
     sprintf("// Call function"));
 call_prototype_name = sprintf("%s(", inputObj.fcnName);
-call_prototype_args = "";
 
 full_args = [inputObj.Children, outputObj.Children];
 
-call_prototype_args = {};
+switch (inputObj.Coder)
+    case 'Simulink'
+        call_prototype_args = {'&RTM,'};
+
+    case 'MATLAB'
+        call_prototype_args = {};
+
+end
 for j=1:numel(full_args)
 
     thisArg = {};
@@ -74,7 +105,7 @@ for j=1:numel(full_args)
 
 
     if j<numel(full_args)
-        thisArg = strcat(thisArg, sprintf(", \n"));
+        thisArg = strcat(thisArg, sprintf(", "));
     end
 
     call_prototype_args = vertcat(call_prototype_args, ...

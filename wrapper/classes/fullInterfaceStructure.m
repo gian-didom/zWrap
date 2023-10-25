@@ -4,6 +4,7 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
 
     properties
         fcnName
+        headerName
     end
 
     methods
@@ -29,11 +30,28 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
             obj.ByteSize= NaN;         % Right now, not a number
             obj.Padding = 0;
             obj.Children = [];
-            obj.fcnName = codeInfoObject.Name; % or GraphicalPath?
+            obj.fcnName = codeInfoObject.OutputFunctions.Prototype.Name; % or GraphicalPath?
+            obj.headerName = codeInfoObject.Name;
+
+            if not(strcmp(obj.fcnName, obj.headerName)) 
+                obj.Coder = 'Simulink';
+            else
+                obj.Coder = 'MATLAB';
+            end
+
             for j=1:numel(codeInfoObject.(fieldToLook))
+                if not(any(strcmp(codeInfoObject.(fieldToLook)(j).Implementation.Identifier, {codeInfoObject.OutputFunctions(1).Prototype.Arguments.Name})))
+                    % This has been unused and removed. Good.
+                    continue;
+                end
                 output = coderArgument.processObject2(codeInfoObject.(fieldToLook)(j));
                 if numel(output)>1; for j=1:numel(output); output{j}.Role = roleToAssign; end; else; output.Role = roleToAssign; end;
                 obj.Children = appendCell(obj.Children, output);
+                
+            end
+
+            for j=1:numel(obj.Children)
+                obj.Children(j).Coder = obj.Coder;
             end
 
             obj.AlignmentRequirement = max(arrayfun(@(x) x.AlignmentRequirement, obj.Children));
@@ -42,21 +60,44 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
 
 
         %% function functionScript = generateMATLABFunction(obj, savepath)
-        function functionScript = generateMATLABFunction(obj, savepath)
+        function functionScript = generateMATLABFunction(obj, savepath, test)
+            
 
-            % The accessName is given from the parent
-
-
-            functionScript = {};
-            if numel(obj.Children) > 1
-                functionScript = vertcat(functionScript, ...
-                    strcat(sprintf('function byteArray = %s_inputSerializer(', obj.fcnName), ...
-                    sprintf('input%i, ', 1:numel(obj.Children)-1), ...
-                    sprintf(' input%i)\n', numel(obj.Children))));
-            else
-                functionScript = vertcat(functionScript, ...
-                    sprintf('function byteArray = %s_inputSerializer(input1)\n', obj.fcnName));
+            if nargin == 2
+                test = false;
             end
+
+            if not(test)
+                % The accessName is given from the parent
+                savepath = fullfile(savepath, sprintf('%s_inputSerializer.m', obj.fcnName));
+
+                functionScript = {};
+                if numel(obj.Children) > 1
+                    functionScript = vertcat(functionScript, ...
+                        strcat(sprintf('function byteArray = %s_inputSerializer(', obj.fcnName), ...
+                        sprintf('input%i, ', 1:numel(obj.Children)-1), ...
+                        sprintf(' input%i)\n', numel(obj.Children))));
+                else
+                    functionScript = vertcat(functionScript, ...
+                        sprintf('function byteArray = %s_inputSerializer(input1)\n', obj.fcnName));
+                end
+
+            else
+                savepath = fullfile(savepath, sprintf('%s_inputSerializer_test.m', obj.fcnName));
+
+                functionScript = {};
+                if numel(obj.Children) > 1
+                    functionScript = vertcat(functionScript, ...
+                        strcat(sprintf('function byteArray = %s_inputSerializer_test(', obj.fcnName), ...
+                        sprintf('input%i, ', 1:numel(obj.Children)-1), ...
+                        sprintf(' input%i)\n', numel(obj.Children))));
+                else
+                    functionScript = vertcat(functionScript, ...
+                        sprintf('function byteArray = %s_inputSerializer_test(input1)\n', obj.fcnName));
+                end
+            end
+
+
 
             functionScript = vertcat(functionScript, ...
                 sprintf("byteArray = uint8(zeros(%i, 1));", obj.getTotalSizePadded()));
@@ -71,7 +112,7 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
 
 
             functionScript = vertcat(functionScript, sprintf("\nend"));
-            if nargin == 2
+            if nargin >= 2
                 % Save to path
                 fid = fopen(savepath, 'w');
                 fprintf(fid, "%s\n", functionScript);
@@ -88,15 +129,27 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
 
         %% function functionScript = generateMATLABFunction(obj, accessName)
 
-        function functionScript = generateDecoderFunction(obj, savepath)
+        function functionScript = generateDecoderFunction(obj, savepath, test)
 
+            if nargin == 2
+                test = false;
+            end
 
-            % The accessName is given from the parent
-
+            if not(test)
+            savepath = fullfile(savepath, sprintf('%s_outputParser.m', obj.fcnName));
             functionScript = {};
             functionScript = vertcat(functionScript, ...
                 strcat(sprintf('function ['), sprintf('output%i ', 1:numel(obj.Children)), ...
                 sprintf(']  = %s_outputParser(byteArray)', obj.fcnName)));
+            else
+            savepath = fullfile(savepath, sprintf('%s_outputParser_test.m', obj.fcnName));
+            functionScript = {};
+            functionScript = vertcat(functionScript, ...
+                strcat(sprintf('function ['), sprintf('output%i ', 1:numel(obj.Children)), ...
+                sprintf(']  = %s_outputParser_test(byteArray)', obj.fcnName)));
+            end
+            % The accessName is given from the parent
+
 
 
             % This is the array pointer: it goes forward according to each
@@ -118,7 +171,7 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
 
 
             functionScript = vertcat(functionScript, sprintf("\nend"));
-            if nargin == 2
+            if nargin >= 2
                 % Save to path
                 fid = fopen(savepath, 'w');
                 fprintf(fid, "%s\n", functionScript);

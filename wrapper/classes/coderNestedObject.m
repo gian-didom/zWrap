@@ -49,7 +49,7 @@ classdef (HandleCompatible, Abstract) coderNestedObject < coderArgument
             % TODO: Check with codeinfo if to pass by reference
             % Default: yes
 
-            name = strcat('&(', baseName, '->', obj.Name, ')');
+            name = strcat('(', baseName, '->', obj.Name, ')');
         end
 
 
@@ -125,7 +125,7 @@ classdef (HandleCompatible, Abstract) coderNestedObject < coderArgument
             %   Detailed explanation goes here
             if strcmp(inobj.Identifier(1:4), 'cell')
                 outobj = coderHeterogeneousCell(inobj);
-            elseif strcmp(inobj.Identifier(1:6), 'struct')
+            elseif strcmp(inobj.Identifier(1:6), 'struct') || isa(inobj, "coder.types.Struct")
                 outobj = coderStructure(inobj);
             else % It should be a class
                 outobj = coderClass.create(inobj);

@@ -6,8 +6,8 @@ function zSettings = parsezArgs(varargin)
 % * |ip|        - The IP address to assign to the board [192.168.1.10]
 % * |udpport|   - The default port to use for UDP communication [8]
 % * |tcpport|   - The default port to use for TCP communication [7]
-% * |stack|     - The desired maximum stack size [-]
-% * |heap|      - The desired maximum heap size [2000]
+% * |stack|     - The desired maximum stack size for core1 [2 MB, 0x200000]
+% * |heap|      - The desired maximum heap size for core1 [8192 bytes, 0x2000]
 % * |baud|      - The default baud rate for Serial communication [115200]
 %
 %%% Trigger arguments
@@ -24,8 +24,8 @@ function zSettings = parsezArgs(varargin)
 % * |pack|      - Use #pragma pack(1) to solve potential memory padding issues
 
 % 
-paramsNameValue = {'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
-paramsDefaultValues = {'192.168.1.10', '8', '7', 'NaN', '2000', '115200'};
+paramsNameValue = {'path', 'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
+paramsDefaultValues = {'none', '192.168.1.10', '8', '7', '200000', '2000', '115200'};
 paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
 
 % Initialize structure
@@ -54,6 +54,24 @@ for j=1:numel(varargin)
             error('Unrecognized option %s', varargin{j});
         end
     end
+end
+
+assert(isfield(zSettings, 'path'), "Path not provided. Please specify a path with the -path flag.");
+assert(exist(zSettings.path, 'dir'), "The specified path <strong>%s</strong> does not exist.", zSettings.path)
+
+% Fix stack size
+if strcmp(zSettings.stack(1:2), "0x")
+    zSettings.stack = hex2dec(zSettings.stack);
+else
+    zSettings.stack = str2double(zSettings.stack);
+end
+
+
+% Fix heap size
+if strcmp(zSettings.heap(1:2), "0x")
+    zSettings.heap = hex2dec(zSettings.heap);
+else
+    zSettings.heap = str2double(zSettings.heap);
 end
 
 end

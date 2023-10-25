@@ -44,7 +44,8 @@ CppScript = vertcat(CppScript, ...
 % However, the inlcude also includes the types, so...
 %% Function types
 CppScript = vertcat(CppScript, ...
-    sprintf('#include "%s.h"\n', inputObj.fcnName));
+    sprintf('#include "%s.h"\n', inputObj.headerName));
+
 
 
 %% Coder namespace
@@ -94,11 +95,28 @@ CppScript = vertcat(CppScript, ...
 CppScript = vertcat(CppScript, ...
     sprintf("void callFunction();"));
 
-% That's it!
+%% For SIMULINK
+if strcmp(inputObj.Coder, "Simulink")
+
+    % Define dwork
+    CppScript = vertcat(CppScript, ...
+    sprintf("static DW dwork;")); 
+
+    % Define RT_MODEL
+    CppScript = vertcat(CppScript, ...
+    sprintf("static RT_MODEL RTM;")); 
+
+   
+    % Define model initialization variable
+    CppScript = vertcat(CppScript, ...
+    sprintf("static bool MODEL_INITIALIZED = false;")); 
+end
+
+
+%% That's it!
 
 CppScript = vertcat(CppScript, ...
     sprintf("#endif"));
-
 
 %% Save file
 fid = fopen(save_file_path, 'w');

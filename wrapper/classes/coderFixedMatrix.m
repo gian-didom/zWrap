@@ -16,7 +16,7 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
 
             %UNTITLED8 Construct an instance of this class
             %   Detailed explanation goes here
-            obj.Dimension = codeInfoObj.Dimensions;
+            obj.Dimension = codeInfoObj.Dimensions;           
             obj.NumEl = prod(obj.Dimension);
             obj.BaseType = coderArgument.processObject2(codeInfoObj.BaseType);
             obj.Type = obj.BaseType.Type;
@@ -55,9 +55,18 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
 %%        function td = getCppDeclaration(obj)
 
         function td = getCppDeclaration(obj)
+            switch obj.Coder
+
+                case 'MATLAB'
             td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
                 sprintf("[%i]", flip(obj.Dimension)), ...
                 ";");
+                case 'Simulink'
+td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
+                sprintf("[%i]", prod(obj.Dimension)), ...
+                ";");
+            end
+
         end
 
 %%         function size = getTotalSize(obj)

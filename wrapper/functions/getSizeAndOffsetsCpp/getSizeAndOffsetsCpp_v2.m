@@ -12,13 +12,31 @@ end
 arm_compiler_path = '/opt/homebrew/bin/arm-none-eabi-g++';
 nm_path = strrep(arm_compiler_path, 'g++', 'nm');
 gdb_path = strrep(arm_compiler_path, 'g++', 'gdb');
+%% STEP 0: Clean
+if isfile('temp/getSizeAndOffsetsGDB.cpp')
+    delete('temp/getSizeAndOffsetsGDB.cpp');
+end
+
+if isfile('temp/getSizeAndOffsetsGDB.o')
+    delete('temp/getSizeAndOffsetsGDB.o')
+end
 
 %% STEP 1: Generate C++ source file
 % The C source files only contains definition of the various structures,
 % then using the arm-none-eabi-nm command, the size table is retrieved.
 
 sourceLines = cell(0,1);
+if isfile(fullfile(packDir, sprintf("%s_types.h", buildInfo.ComponentName)))
 sourceLines{end+1}  = sprintf("#include ""%s_types.h""\n\n", buildInfo.ComponentName);
+end
+
+if isfile(fullfile(packDir, sprintf("%s.h", buildInfo.ComponentName)))
+sourceLines{end+1}  = sprintf("#include ""%s.h""\n\n", buildInfo.ComponentName);
+end
+
+sourceLines{end+1}  = sprintf("\n#ifndef RTWTYPES_H");
+sourceLines{end+1}  = sprintf("#include ""rtwtypes.h""\n\n");
+sourceLines{end+1}  = sprintf("#endif\n\n");
 
 % Full input
 sourceLines{end+1} = sprintf("namespace coder {");
@@ -51,31 +69,33 @@ sourceLines{end+1} = sprintf("} FULL_OUTPUT_STRUCT;\n");
 sourceLines{end+1} = sprintf("\n\nint main() {return 0;};");
 
 sourceLines{end+1} = sprintf("}"); 
-file_to_save = 'getSizeAndOffsetsGDB.cpp';
+file_to_save = fullfile('temp', 'getSizeAndOffsetsGDB.cpp');
 
 fid = fopen(file_to_save, 'w');
 fprintf(fid, '%s\n%s\n%s', sourceLines{:});
 fclose(fid);
 
 %% RUN COMPILATION - WITH DEBUG OPTIONS FOR GDB
-fprintf('Running %s -I "%s" -c getSizeAndOffsetsGDB.cpp -o getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir);
-system(sprintf('%s -I %s -O0 -c getSizeAndOffsetsGDB.cpp -o getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir), '-echo');
+fprintf('Running %s -I "%s" -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir);
+system(sprintf('%s -I %s -O0 -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir), '-echo');
 
 
 %% Do for FULL_INPUT_STRUCT
-fprintf('\nRunning %s', sprintf("%s -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit\n", gdb_path));
+fprintf('\nRunning %s', sprintf("%s -q temp/getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit\n", gdb_path));
 
-[~, outstring] = system(sprintf("%s -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit", gdb_path));
+[~, outstring] = system(sprintf("%s -q temp/getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit", gdb_path));
 if echo; fprintf(outstring); fprintf("\n\n\n\n"); end
 outlines = splitlines(outstring);
-fullInputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+[0-9])', 'match'));
+fullInputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+)', 'match'));
+if isempty(fullInputSizeGCC); fullInputSizeGCC = 0; end
 
 % [~, outstring] = system(sprintf("%s -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT._%s' --ex exit", gdb_path, codedInputs(1).name));
 % fprintf(outstring);
-[~, outstring] = system(sprintf("%s -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_OUTPUT_STRUCT' --ex exit", gdb_path));
+[~, outstring] = system(sprintf("%s -q temp/getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_OUTPUT_STRUCT' --ex exit", gdb_path));
 if echo; fprintf(outstring); end
 outlines = splitlines(outstring);
-fullOutputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+[0-9])', 'match'));
+fullOutputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+)', 'match'));
+if isempty(fullOutputSizeGCC); fullOutputSizeGCC = 0; end
 
 return
 
