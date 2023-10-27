@@ -13,6 +13,19 @@ classdef (HandleCompatible) coderClass < coderNestedObject
             obj.setMATLABCastType();
         end
 
+
+        function outvar = getTemplate(obj)
+            % TODO: Check.
+            % For now, we convert the class back to a MATLAB structure. It
+            % should work because classes are nothing more than structure
+            % with methods and constructors. However, we could map the
+            % class back to the MATLAB structure, if the type mapping is
+            % defined somewhere.
+            for j=1:numel(obj.Children)
+                outvar.(obj.Children(j).Name) = obj.Children(j).getTemplate();
+            end
+        end
+
         
         
         %% function functionScript = generateMATLABFunction(obj, accessName)

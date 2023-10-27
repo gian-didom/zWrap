@@ -39,9 +39,6 @@ for j=1:numel(oss.Children)
     arg = oss.Children(j).getTemplate();
     if isstruct(arg)
         args_struct{end+1} = arg;
-        if isfile(temp_bus_file)
-            delete(temp_bus_file)
-        end
         bus = Simulink.Bus.createObject(arg, temp_bus_file);
         fid = fopen(temp_bus_file, 'r');
         bus_file_content = fileread(temp_bus_file);
@@ -255,19 +252,6 @@ set_param(sprintf('%s/outputParser', subsystem_path), 'Position', pos_output_par
 zphoto.Position(1) = pos_output_parser(1);
 zphoto.Position(2) = pos_output_parser(2)-200;
 zphoto.Position(3:4) = zphoto.Position(1:2) + [40 35]*3.5;
-
-
-%% Add initialization callback, to embed buses inside the model
-initfcn_string = '';
-for j=1:numel(output_buses)
-    bus = output_buses{j};
-    initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n\n", ...
-        initfcn_string, ...
-        bus.cellrep, ...
-        bus.cellname);
-end
-
-set_param(subsystem_path, 'InitFcn', initfcn_string);
 
 
 
