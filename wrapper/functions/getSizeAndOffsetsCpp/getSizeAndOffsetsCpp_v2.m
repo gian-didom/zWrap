@@ -77,8 +77,8 @@ fclose(fid);
 
 %% RUN COMPILATION - WITH DEBUG OPTIONS FOR GDB
 fprintf('Running %s -I "%s" -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir);
-system(sprintf('%s -I %s -O0 -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir), '-echo');
-
+[compilationStatus, ~] = system(sprintf('%s -I %s -O0 -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir), '-echo');
+assert(compilationStatus==0, "Error during compilation. Please check the console output.");
 
 %% Do for FULL_INPUT_STRUCT
 fprintf('\nRunning %s', sprintf("%s -q temp/getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit\n", gdb_path));
