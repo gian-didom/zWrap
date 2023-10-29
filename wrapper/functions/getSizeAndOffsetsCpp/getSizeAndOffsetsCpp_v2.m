@@ -10,8 +10,14 @@ end
 %% TODO: ESCAPE CHARACTERS!!!!
 
 %% TODO: FIX FOR ARRAY OF STRUCTURES. IN THIS CASE, WHAT IT SHOULD BE DONE IS TO MAP ALSO THE MEMORY OF A SINGLE INSTANCE.
+switch computer
+    case {'MACA64', 'GLNXA64'}
+        compilerFile = 'arm-none-eabi-g++';
+    case 'PCWIN64'
+        compilerFile = 'arm-none-eabi-g++.exe';
+end
 
-arm_compiler_path = fullfile(zEnv.armPath, 'arm-none-eabi-g++');
+arm_compiler_path = fullfile(zEnv.armPath, compilerFile);
 % nm_path = strrep(arm_compiler_path, 'g++', 'nm');
 gdb_path = strrep(arm_compiler_path, 'g++', 'gdb');
 
@@ -75,23 +81,34 @@ sourceLines{end+1} = sprintf("} FULL_OUTPUT_STRUCT;\n");
 sourceLines{end+1} = sprintf("\n\nint main() {return 0;};");
 
 sourceLines{end+1} = sprintf("}"); 
-file_to_save = fullfile('temp', 'getSizeAndOffsetsGDB.cpp');
+CPP_test_file = fullfile('temp', 'getSizeAndOffsetsGDB.cpp');
 
-fid = fopen(file_to_save, 'w');
+fid = fopen(CPP_test_file, 'w');
 fprintf(fid, '%s\n%s\n%s', sourceLines{:});
 fclose(fid);
 
 %% RUN COMPILATION - WITH DEBUG OPTIONS FOR GDB
-fprintf('Running %s -I "%s" -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g\n', arm_compiler_path, packDir);
-[compilationStatus, ~] = system(sprintf('%s -I %s -O0 -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir), '-echo');
+output_test_file = fullfile('temp', 'getSizeAndOffsetsGDB.o');
+
+fprintf('Running %s -I "%s" -c %s -o %s -g\n', ...
+    arm_compiler_path, ...
+    packDir, ...
+    CPP_test_file,  ...
+    output_test_file);
+[compilationStatus, ~] = system(sprintf('%s -I %s -O0 -c %s -o %s -g', ...
+                                        arm_compiler_path, ...
+                                        packDir, ...
+                                        CPP_test_file,  ...
+                                        output_test_file), ... 
+                               '-echo');
 assert(compilationStatus==0, "Error during compilation. Please check the console output.");
 
 %% Do for FULL_INPUT_STRUCT
-fprintf('\nRunning %s', sprintf("%s -q %s --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit\n", ...
-    gdb_path, fullfile("temp", "getSizeAndOffsetsGDB.o")));
+fprintf('\nRunning %s', sprintf("%s -q %s --batch --x %s\n", ...
+    gdb_path, output_test_file, fullfile('support', 'GDB_InputStructCommand.txt')));
 
-[~, outstring] = system(sprintf("%s -q %s --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT' --ex exit", ...
-    gdb_path, fullfile("temp", "getSizeAndOffsetsGDB.o")));
+[~, outstring] = system(sprintf("%s -q %s --batch --x %s", ...
+    gdb_path, output_test_file, fullfile('support', 'GDB_InputStructCommand.txt')));
 
 if echo; fprintf(outstring); fprintf("\n\n\n\n"); end
 outlines = splitlines(outstring);
@@ -100,8 +117,10 @@ if isempty(fullInputSizeGCC); fullInputSizeGCC = 0; end
 
 % [~, outstring] = system(sprintf("%s -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT._%s' --ex exit", gdb_path, codedInputs(1).name));
 % fprintf(outstring);
-[~, outstring] = system(sprintf("%s -q %s --batch --ex 'ptype /o coder::FULL_OUTPUT_STRUCT' --ex exit", ...
-    gdb_path, fullfile("temp", "getSizeAndOffsetsGDB.o")));
+fprintf('\nRunning %s', sprintf("%s -q %s --batch --x %s\n", ...
+    gdb_path, output_test_file, fullfile('support', 'GDB_OutputStructCommand.txt')));
+[~, outstring] = system(sprintf("%s -q %s --batch --x %s", ...
+    gdb_path, output_test_file, fullfile('support', 'GDB_OutputStructCommand.txt')));
 
 if echo; fprintf(outstring); end
 outlines = splitlines(outstring);
@@ -109,13 +128,9 @@ fullOutputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+)', 'match'));
 if isempty(fullOutputSizeGCC); fullOutputSizeGCC = 0; end
 
 %% FINAL STEP: Clean
-if isfile('temp/getSizeAndOffsetsGDB.cpp')
-    delete('temp/getSizeAndOffsetsGDB.cpp');
-end
+delete(CPP_test_file);
+delete(output_test_file)
 
-if isfile('temp/getSizeAndOffsetsGDB.o')
-    delete('temp/getSizeAndOffsetsGDB.o')
-end
 
 
 return

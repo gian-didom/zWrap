@@ -1,49 +1,35 @@
 function checkARMTools()
 global zEnv zSettings
 
-if isfield(zSettings, 'armPath') && isfile(fullfile(zSettings.armPath, 'arm-none-eabi-g++'))
-    fprintf("Arm compiler found at %s", fullfile(zSettings.armPath, 'arm-none-eabi-g++'));
-    zEnv.armPath = zSettings.armPath;
+switch computer
+    case {'MACA64', 'GLNXA64'}
+        execFile = 'arm-none-eabi-g++';
+    case 'PCWIN64'
+        execFile = 'arm-none-eabi-g++.exe';
+end
+
+if isfield(zSettings, 'customArmPath') && isfile(fullfile(zSettings.customArmPath, execFile))
+    fprintf("Arm compiler found at %s", fullfile(zSettings.customArmPath, execFile));
+    zEnv.armPath = zSettings.customArmPath;
     return
 end
 
-switch computer
-    case 'MACA64'
-        % MacOS
-        pathList = { ...
-            "/opt/homebrew/bin";
-            "/opt/homebrew/sbin";
-            "/usr/local/bin";
-            "/usr/bin";
-            "/bin";
-            "/usr/sbin";
-            "/sbin";
-            "ops/X11/bin";
-            "/Library/Apple/usr/bin";
-            };
-
-    case 'PCWIN64'
-        % Windows
-
-    case 'GLNXA64'
-        % Linux
-    
-end
+uniquePathList = getPossibleToolPaths();
 
 % Check if executable exists.
-foundExec = cellfun(@(x) isfile(fullfile(x, 'arm-none-eabi-g++')), pathList);
+foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 assert(any(foundExec), "ARM compiler not found. Please install ARM compiler from ARM website.")
 
 % If we're here, we found the compiler
 if sum(foundExec) > 1
     % Found multiple ARM compilers. Taking the first.
     warning("Found multiple ARM compilers. ARM compiler set to %s", ...
-        pathList{foundExec}, fullfile(pathList{find(foundExec,1)}));
-    zEnv.armPath = fullfile(pathList{find(foundExec,1)});
+       fullfile(uniquePathList{find(foundExec,1)}));
+    zEnv.armPath = fullfile(uniquePathList{find(foundExec,1)});
 else
     % Found a unique ARM compiler.
     fprintf("Found ARM compiler at %s\n", ...
-        fullfile(pathList{find(foundExec,1)}));
-    zEnv.armPath = fullfile(pathList{find(foundExec,1)});
+        fullfile(uniquePathList{find(foundExec,1)}));
+    zEnv.armPath = fullfile(uniquePathList{find(foundExec,1)});
 
 end

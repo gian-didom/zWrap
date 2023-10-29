@@ -1,39 +1,24 @@
 function checkGNUMake()
 global zEnv zSettings
 
-execName = 'make';
+switch computer
+    case {'MACA64', 'GLNXA64'}
+        execFile = 'make';
+    case 'PCWIN64'
+        execFile = 'make.exe';
+end
 
-if isfield(zSettings, 'makePath') && isfile(fullfile(zSettings.makePath, execName))
-    fprintf("GNU make found at %s", fullfile(zSettings.makePath, execName));
-    zEnv.makePath = zSettings.makePath;
+if isfield(zSettings, 'customMakePath') && isfile(fullfile(zSettings.customMakePath, execFile))
+    fprintf("GNU make found at %s", fullfile(zSettings.customMakePath, execFile));
+    zEnv.makePath = zSettings.customMakePath;
     return
 end
 
-switch computer
-    case 'MACA64'
-        % MacOS
-        pathList = { ...
-            "/opt/homebrew/bin";
-            "/opt/homebrew/sbin";
-            "/usr/local/bin";
-            "/usr/bin";
-            "/bin";
-            "/usr/sbin";
-            "/sbin";
-            "ops/X11/bin";
-            "/Library/Apple/usr/bin";
-            };
 
-    case 'PCWIN64'
-        % Windows
-
-    case 'GLNXA64'
-        % Linux
-    
-end
+uniquePathList = getPossibleToolPaths();
 
 % Check if executable exists.
-foundExec = cellfun(@(x) isfile(fullfile(x, execName)), pathList);
+foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 if not(any(foundExec))
 warning("GNU make not found. Please install GNU make from official website. " + ...
     "zWrap can run, but you won't be able to run makefiles.")
@@ -46,12 +31,15 @@ end
 if sum(foundExec) > 1
     % Found multiple ARM compilers. Taking the first.
     warning("Found multiple GNU make tools. GNU make set to %s", ...
-        pathList{foundExec}, fullfile(pathList{find(foundExec,1)}));
-    zEnv.makePath = fullfile(pathList{find(foundExec,1)});
+        fullfile(uniquePathList{find(foundExec,1)}));
+
+    fprintf("Found GNU make at %s\n", ...
+        fullfile(uniquePathList{find(foundExec,1)}));
+    zEnv.makePath = fullfile(uniquePathList{find(foundExec,1)});
 else
     % Found a unique ARM compiler.
     fprintf("Found GNU make at %s\n", ...
-        fullfile(pathList{find(foundExec,1)}));
-    zEnv.makePath = fullfile(pathList{find(foundExec,1)});
+        fullfile(uniquePathList{find(foundExec,1)}));
+    zEnv.makePath = fullfile(uniquePathList{find(foundExec,1)});
 
 end
