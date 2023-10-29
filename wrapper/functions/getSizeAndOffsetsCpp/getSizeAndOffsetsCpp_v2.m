@@ -76,7 +76,7 @@ fprintf(fid, '%s\n%s\n%s', sourceLines{:});
 fclose(fid);
 
 %% RUN COMPILATION - WITH DEBUG OPTIONS FOR GDB
-fprintf('Running %s -I "%s" -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir);
+fprintf('Running %s -I "%s" -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g\n', arm_compiler_path, packDir);
 [compilationStatus, ~] = system(sprintf('%s -I %s -O0 -c temp/getSizeAndOffsetsGDB.cpp -o temp/getSizeAndOffsetsGDB.o -g', arm_compiler_path, packDir), '-echo');
 assert(compilationStatus==0, "Error during compilation. Please check the console output.");
 
