@@ -3,7 +3,7 @@ global zEnv zSettings
 
 execName = 'bootgen';
 
-if isfield(zSettings, 'bootgenPath') && isfile(fullfile(zSettings.customBootgenPath, execName))
+if isfield(zSettings, 'customBootgenPath') && isfile(fullfile(zSettings.customBootgenPath, execName))
     fprintf("bootgen found at %s", fullfile(zSettings.customBootgenPath, execName));
     zEnv.bootgenPath = zSettings.customBootgenPath;
     return

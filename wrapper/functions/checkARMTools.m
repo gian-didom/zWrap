@@ -9,7 +9,7 @@ switch computer
 end
 
 if isfield(zSettings, 'customArmPath') && isfile(fullfile(zSettings.customArmPath, execFile))
-    fprintf("Arm compiler found at %s", fullfile(zSettings.customArmPath, execFile));
+    fprintf("ARM compiler found at %s", fullfile(zSettings.customArmPath, execFile));
     zEnv.armPath = zSettings.customArmPath;
     return
 end

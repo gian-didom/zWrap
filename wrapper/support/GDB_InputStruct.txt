@@ -1,0 +1,1 @@
+ptype /o FULL_INPUT_STRUCTURE
