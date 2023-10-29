@@ -1,0 +1,73 @@
+function checkARMTools()
+global zEnv zSettings
+
+if isfield(zSettings, 'armPath') && isfile(fullfile(zSettings.armPath, 'arm-none-eabi-g++'))
+    fprintf("Arm compiler found at %s", fullfile(zSettings.armPath, 'arm-none-eabi-g++'));
+    zEnv.armPath = zSettings.armPath;
+    return
+end
+
+switch computer
+    case 'MACA64'
+        % MacOS
+        pathList = { ...
+            "/opt/homebrew/bin";
+            "/opt/homebrew/sbin";
+            "/usr/local/bin";
+            "/usr/bin";
+            "/bin";
+            "/usr/sbin";
+            "/sbin";
+            "ops/X11/bin";
+            "/Library/Apple/usr/bin";
+            };
+
+    case 'PCWIN64'
+        % Windows
+        % Here we will look both into Windows default paths and the Xilinx
+        % paths.
+        [code, cmPATH] = system("echo %PATH%");
+        [code, psPATH] = system("powershell $Env:Path");
+        pathList = split(strcat(cmPATH, psPATH), ':');
+
+        % Vitis paths
+        possibleVers = arrayfun(@(x) sprintf("%i.1", x), [2016:2023].', 'UniformOutput', false);
+        possibleVers = vertcat(possibleVers,...
+        arrayfun(@(x) sprintf("%i.2", x), [2016:2023].', 'UniformOutput', false));
+        possibleVitisPaths = cellfun(@(x) strrep("C:\Program Files\Xilinx\Vitis\{{VER}}\gnu\aarch32\nt\gcc-arm-none-eabi\bin", "{{VER}}", x), ...
+            possibleVers, 'UniformOutput', false);
+
+        pathList = vertcat(pathList, possibleVitisPaths);
+
+        pathList = cellfun(@(x) char(x), pathList, 'UniformOutput',false);
+        
+        uniquePathList = {};
+        for j=1:numel(pathList)
+            pth = pathList{j};
+            if find(strcmp(pth, pathList), 1) == j
+                uniquePathList = vertcat(uniquePathList, pth);
+            end
+        end
+
+    case 'GLNXA64'
+        % Linux
+    
+end
+
+% Check if executable exists.
+foundExec = cellfun(@(x) isfile(fullfile(x, 'arm-none-eabi-g++')), uniquePathList);
+assert(any(foundExec), "ARM compiler not found. Please install ARM compiler from ARM website.")
+
+% If we're here, we found the compiler
+if sum(foundExec) > 1
+    % Found multiple ARM compilers. Taking the first.
+    warning("Found multiple ARM compilers. ARM compiler set to %s", ...
+        pathList{foundExec}, fullfile(pathList{find(foundExec,1)}));
+    zEnv.armPath = fullfile(pathList{find(foundExec,1)});
+else
+    % Found a unique ARM compiler.
+    fprintf("Found ARM compiler at %s\n", ...
+        fullfile(pathList{find(foundExec,1)}));
+    zEnv.armPath = fullfile(pathList{find(foundExec,1)});
+
+end

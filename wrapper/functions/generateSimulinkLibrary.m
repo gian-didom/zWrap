@@ -17,12 +17,45 @@ new_system(modelname, 'Library');
 % To do that, we must get the MATLAB templates for the I/O
 
 args_struct = {};
+input_buses = {};
+temp_bus_file = fullfile('temp', 'bus_generator.m');
 
 for j=1:numel(iss.Children)
     arg = iss.Children(j).getTemplate();
     if isstruct(arg)
         args_struct{end+1} = arg;
-        Simulink.Bus.createObject(arg);
+        bus = Simulink.Bus.createObject(arg, temp_bus_file);
+        bus.index = j;
+        fid = fopen(temp_bus_file, 'r');
+        bus_file_content = fread(fid);
+        fclose(fid);
+        bus.cellrep = Simulink.Bus.objectToCell(bus.busName);
+        input_buses{end+1} = bus;
+    end
+end
+
+output_buses = {};
+for j=1:numel(oss.Children)
+    arg = oss.Children(j).getTemplate();
+    if isstruct(arg)
+        args_struct{end+1} = arg;
+        if isfile(temp_bus_file)
+            delete(temp_bus_file)
+        end
+        bus = Simulink.Bus.createObject(arg, temp_bus_file);
+        fid = fopen(temp_bus_file, 'r');
+        bus_file_content = fileread(temp_bus_file);
+        [sI, eI] = regexp(bus_file_content, "cellInfo = {(.*)}';");
+        bus.index = j;
+        if isempty(sI) || isempty(eI)
+            warning("Failed to add bus %s to the model. Please debug.",  bus.busName);
+            bus.cellrep = '';
+            bus.cellname = '';
+        else
+            bus.cellname = sprintf("cellInfo_%s", bus.busName);
+            bus.cellrep = strrep(bus_file_content(sI:eI), 'cellInfo', bus.cellname);
+        end
+        output_buses{end+1} = bus;
     end
 end
 
@@ -59,6 +92,14 @@ for j=1:numel(oss.Children)
     dims = size(oss.Children(j).getTemplate());
     stateflowBlock.Outputs(j).Props.Array.Size = strcat("[", sprintf('%i ', dims), "]");
 end
+
+% Set output types to the corresponding Bus for structures
+for j=1:numel(output_buses)
+    bus = output_buses{j};
+    outputIndex = bus.index;
+    stateflowBlock.Outputs(outputIndex).DataType = sprintf("Bus: %s", bus.busName);
+end
+
 outputMask = Simulink.Mask.create(sprintf('%s/outputParser', subsystem_path));
 outputMask.IconUnits = 'pixels';
 outputMask.Display = maskCommandOutput;
@@ -214,6 +255,19 @@ set_param(sprintf('%s/outputParser', subsystem_path), 'Position', pos_output_par
 zphoto.Position(1) = pos_output_parser(1);
 zphoto.Position(2) = pos_output_parser(2)-200;
 zphoto.Position(3:4) = zphoto.Position(1:2) + [40 35]*3.5;
+
+
+%% Add initialization callback, to embed buses inside the model
+initfcn_string = '';
+for j=1:numel(output_buses)
+    bus = output_buses{j};
+    initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n\n", ...
+        initfcn_string, ...
+        bus.cellrep, ...
+        bus.cellname);
+end
+
+set_param(subsystem_path, 'InitFcn', initfcn_string);
 
 
 

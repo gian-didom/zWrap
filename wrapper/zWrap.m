@@ -1,5 +1,5 @@
 function [outputArg1,outputArg2] = zWrap(varargin)
-global zSettings
+global zSettings zEnv
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 addpath(genpath('classes'));
@@ -11,6 +11,12 @@ fprintbf("Checking dependencies...\n");
 
 %% Parse inputs
 zSettings = parsezArgs(varargin{:});
+
+%% STEP 0.1: Check if tools are available
+% Check OS
+checkARMTools();    % Checks path of ARM tools and adds the executable to zEnv
+checkGNUMake();     % Checks path of GNU make and adds the executable to zEnv
+checkBootgen();     % Checks path of bootgen and adds the executable to zEnv
 
 %% TODO: Alternative, give CodeInfo and then base everything on that directory
 coder_project_path = zSettings.path;
@@ -74,6 +80,10 @@ codedInputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
     nameInputs, typeInputs, sizeInputs);
 codedOutputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
     nameOutputs, typeOutputs, sizeOutputs);
+
+% Clean the ones not used in iss
+index_found = arrayfun(@(s) any(strcmp(s.name, {iss.Children.Name})), codedInputs);
+codedInputs = codedInputs(index_found);
 
 echo = true;
 [GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, codedOutputs, packDir, echo);
@@ -161,7 +171,16 @@ printDone();
 
 %% GENERATE BOARD BUILD
 boardName = 'zedboard';
-rmpath(genpath('boards'));
+pathsToRemove = split(genpath('boards'), ':');
+
+% rmpath(genpath('boards'));
+for j=1:numel(pathsToRemove)
+    pth = pathsToRemove{j};
+    if contains(path, strcat(pth, '\n'))
+        rmpath(pth)
+    end
+end
+
 addpath(genpath(fullfile('boards', boardName)));
 buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
 
@@ -187,6 +206,13 @@ SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', i
 generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
 fprintbf('Simulink library succesfully created at %s!\n', SimulinkLibraryPath)
 
+
+%% RUN TESTS
+
+% Test 1: hard-coded memory address is the one obtained from the Core 1
+% disassembly (needs .elf file compilation)
+
+%% CLEAR
 clear zSettings;
 fprintbf('Process completed. Insert the SD card in the ZedBoard and run a Simulink test case with the provided block.\n')
 end

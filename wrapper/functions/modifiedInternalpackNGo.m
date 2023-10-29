@@ -137,7 +137,17 @@ function locPackFlat(buildInfo, args, buildDir)
     packBuildInfos = false;
     % get all of the files
     [fPathNames, names] = locGetAllFiles(buildInfo, args, buildDir, packBuildInfos);
+    names_uq = {};
+    path_uq = {};
+    for j=1:numel(names)
+        if isempty(find(strcmp(names_uq, names{j}), 1))
+            names_uq{end+1} = names{j};
+            path_uq{end+1} = fPathNames{j};
+        end
+    end
 
+    names =  names_uq;
+    fPathNames =  path_uq;
 
     if args.includeReport
         % flat packing does not support including the html report because

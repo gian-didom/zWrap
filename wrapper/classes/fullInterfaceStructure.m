@@ -4,6 +4,7 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
 
     properties
         fcnName
+        headerName
     end
 
     methods
@@ -29,11 +30,28 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
             obj.ByteSize= NaN;         % Right now, not a number
             obj.Padding = 0;
             obj.Children = [];
-            obj.fcnName = codeInfoObject.Name; % or GraphicalPath?
+            obj.fcnName = codeInfoObject.OutputFunctions.Prototype.Name; % or GraphicalPath?
+            obj.headerName = codeInfoObject.Name;
+
+            if not(strcmp(obj.fcnName, obj.headerName)) 
+                obj.Coder = 'Simulink';
+            else
+                obj.Coder = 'MATLAB';
+            end
+
             for j=1:numel(codeInfoObject.(fieldToLook))
+                if not(any(strcmp(codeInfoObject.(fieldToLook)(j).Implementation.Identifier, {codeInfoObject.OutputFunctions(1).Prototype.Arguments.Name})))
+                    % This has been unused and removed. Good.
+                    continue;
+                end
                 output = coderArgument.processObject2(codeInfoObject.(fieldToLook)(j));
                 if numel(output)>1; for j=1:numel(output); output{j}.Role = roleToAssign; end; else; output.Role = roleToAssign; end;
                 obj.Children = appendCell(obj.Children, output);
+                
+            end
+
+            for j=1:numel(obj.Children)
+                obj.Children(j).Coder = obj.Coder;
             end
 
             obj.AlignmentRequirement = max(arrayfun(@(x) x.AlignmentRequirement, obj.Children));

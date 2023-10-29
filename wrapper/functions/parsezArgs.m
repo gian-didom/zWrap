@@ -24,8 +24,8 @@ function zSettings = parsezArgs(varargin)
 % * |pack|      - Use #pragma pack(1) to solve potential memory padding issues
 
 % 
-paramsNameValue = {'path', 'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud'};
-paramsDefaultValues = {'none', '192.168.1.10', '8', '7', '200000', '2000', '115200'};
+paramsNameValue = {'path', 'ip', 'udpport', 'tcpport', 'stack', 'heap', 'baud', 'customArmPath', 'customMakePath', 'customBootgenPath', 'customXilinxPath'};
+paramsDefaultValues = {'none', '192.168.1.10', '8', '7', '200000', '2000', '115200', '', '', '', ''};
 paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
 
 % Initialize structure

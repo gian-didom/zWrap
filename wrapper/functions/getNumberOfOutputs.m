@@ -8,10 +8,19 @@ sizeOutputs = [];
 
 for j=1:numel(codeInfo.Outports)
     impl = codeInfo.Outports(j).Implementation;
+
+    if isprop(impl, 'Identifier')
+        idFieldName = 'Identifier';
+    elseif isprop(impl, 'ElementIdentifier')
+        idFieldName = 'ElementIdentifier';
+    else
+        error('No Identifier field in structure');
+    end
+
     % Check if single or multi
     if ~any(strcmp(fields(impl),'Elements'))
         numOutputs = numOutputs + 1;
-        nameOutputs = [nameOutputs; string(impl.Identifier)];
+        nameOutputs = [nameOutputs; string(impl.(idFieldName))];
         if any(strcmp(fields(impl.Type),'BaseType'))
             typeOutputs = [typeOutputs; string(impl.Type.BaseType.Identifier)];
             sizeOutputs = [sizeOutputs; prod(impl.Type.Dimensions)];
