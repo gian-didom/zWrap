@@ -1,5 +1,5 @@
 function [outputArg1,outputArg2] = zWrap(varargin)
-global zSettings
+global zSettings zEnv
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 addpath(genpath('classes'));
@@ -11,6 +11,12 @@ fprintbf("Checking dependencies...\n");
 
 %% Parse inputs
 zSettings = parsezArgs(varargin{:});
+
+%% STEP 0.1: Check if tools are available
+% Check OS
+checkARMTools();    % Checks path of ARM tools and adds the executable to zEnv
+checkGNUMake();     % Checks path of GNU make and adds the executable to zEnv
+checkBootgen();     % Checks path of bootgen and adds the executable to zEnv
 
 %% TODO: Alternative, give CodeInfo and then base everything on that directory
 coder_project_path = zSettings.path;
@@ -165,7 +171,16 @@ printDone();
 
 %% GENERATE BOARD BUILD
 boardName = 'zedboard';
-rmpath(genpath('boards'));
+pathsToRemove = split(genpath('boards'), ':');
+
+% rmpath(genpath('boards'));
+for j=1:numel(pathsToRemove)
+    pth = pathsToRemove{j};
+    if contains(path, strcat(pth, '\n'))
+        rmpath(pth)
+    end
+end
+
 addpath(genpath(fullfile('boards', boardName)));
 buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
 
