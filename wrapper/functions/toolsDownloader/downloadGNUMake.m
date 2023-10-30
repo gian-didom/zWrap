@@ -25,12 +25,12 @@ switch computer
         downloadLink = 'https://downloads.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-bin.zip';
         downloadLinkDeps = 'https://downloads.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-dep.zip';
         
-        fprintf("Downloading GNU Make for Windows...");
-        [dwnStatus, ~] = system(sprintf('curl -# -o make_bin.zip --output-dir %s -L %s', fullfile('tools', 'temp'), downloadLink));
+        fprintf("Downloading GNU Make for Windows...\n");
+        [dwnStatus, ~] = system(sprintf('curl.exe -# -o make_bin.zip --output-dir %s -L %s', fullfile('tools', 'temp'), downloadLink));
         assert(dwnStatus == 0, "Error in downloading the ARM tools.")
 
-        fprintf("Downloading dependencies...");
-        [dwnStatus, ~] = system(sprintf('curl -# -o make_dep.zip --output-dir %s -L %s', fullfile('tools', 'temp'), downloadLinkDeps));
+        fprintf("Downloading dependencies...\n");
+        [dwnStatus, ~] = system(sprintf('curl.exe -# -o make_dep.zip --output-dir %s -L %s', fullfile('tools', 'temp'), downloadLinkDeps));
         assert(dwnStatus == 0, "Error in downloading the ARM tools.")
 
         fprintf("Download completed. Extracting...\n");
@@ -40,9 +40,10 @@ switch computer
         copyfile(fullfile('tools', 'temp', 'make_dep', 'bin', 'libintl3.dll'), fullfile('tools', 'make', 'bin', 'libintl3.dll'));
         copyfile(fullfile('tools', 'temp', 'make_dep', 'bin', 'libiconv2.dll'), fullfile('tools', 'make', 'bin', 'libiconv2.dll'));
         fprintf("Extraction complete. Trying to running make...");
-        [mkStatus, ~] = system(fullfile("tools", "make", "bin", "make.exe"), '-echo');
+        [mkStatus, ~] = system(sprintf("%s -v", fullfile("tools", "make", "bin", "make.exe")), '-echo');
         assert(mkStatus == 0, "Was not able to run make. Try to review the installation process or manually install make.exe");
-
+        
+        fprintf("GNU make succesfully downloaded.\n");
     case 'GLNXA64'
 
 end
