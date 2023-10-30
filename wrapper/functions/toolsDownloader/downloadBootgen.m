@@ -3,17 +3,18 @@ global zEnv
 %DOWNLOADTOOLS Summary of this function goes here
 %   Detailed explanation goes here
 
+
 switch computer
     case 'MACA64'
         % Download
-
         [openSSLFlag, openSSLDir, openSSLIncludeDir, openSSLLibDir] = getOpenSSLPath();
 
-        if true;% not(openSSLFlag)
+        if not(openSSLFlag)
             % Clear existing
             if isfolder(fullfile("tools", "bootgen", "openssl"))
                 rmdir(fullfile("tools", "bootgen", "openssl"), 's')
             end
+            
             fprintbf("OpenSSL not found. Downloading from source...\n");
             % Download OpenSSL from source
             downloadOpenSSLLink = 'https://github.com/openssl/openssl/archive/refs/heads/master.zip';
@@ -33,7 +34,7 @@ switch computer
 
             % Reshape dirs, everything up one level
             extractDir = extractedFiles{1};
-            movefile(sprintf("%s*", extractDir), fullfile('tools', 'bootgen', 'openssl'));
+            movefile(sprintf("%s*", extractDir), fullfile('tools', 'bootgen', 'openssl'), 'f');
             rmdir(extractDir);
 
             % Run configuration script
@@ -80,7 +81,7 @@ switch computer
 
         % Reshape dirs, everything up one level
         extractDir = extractedFiles{1};
-        movefile(sprintf("%s*", extractDir), fullfile('tools', 'bootgen'));
+        movefile(sprintf("%s*", extractDir), fullfile('tools', 'bootgen'), 'f');
         rmdir(extractDir);
 
         % In order to compile on MacOS, we need to comment all the #include

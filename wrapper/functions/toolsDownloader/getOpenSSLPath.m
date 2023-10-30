@@ -17,7 +17,7 @@ switch computer
         end
 
         outFlag = true;
-        openSSLLibDir = possiblePaths(find(hasOpenSSL, 1));
+        openSSLLibDir = possiblePaths{find(hasOpenSSL, 1)};
         openSSLDir = fileparts(openSSLLibDir);
         openSSLIncludeDir = fullfile(openSSLDir, 'include');
 
