@@ -24,16 +24,26 @@ args_struct = {};
 input_buses = {};
 temp_bus_file = fullfile('temp', 'bus_generator.m');
 
+input_buses = {};
 for j=1:numel(iss.Children)
     arg = iss.Children(j).getTemplate();
     if isstruct(arg)
         args_struct{end+1} = arg;
+        if isfile(temp_bus_file)
+            delete(temp_bus_file)
+        end
         bus = Simulink.Bus.createObject(arg, temp_bus_file);
+        bus_file_content = fileread(temp_bus_file);
+        [sI, eI] = regexp(bus_file_content, "cellInfo = {(.*)}';");
         bus.index = j;
-        fid = fopen(temp_bus_file, 'r');
-        bus_file_content = fread(fid);
-        fclose(fid);
-        bus.cellrep = Simulink.Bus.objectToCell(bus.busName);
+        if isempty(sI) || isempty(eI)
+            warning("Failed to add bus %s to the model. Please debug.",  bus.busName);
+            bus.cellrep = '';
+            bus.cellname = '';
+        else
+            bus.cellname = sprintf("cellInfo_%s", bus.busName);
+            bus.cellrep = strrep(bus_file_content(sI:eI), 'cellInfo', bus.cellname);
+        end
         input_buses{end+1} = bus;
     end
 end
