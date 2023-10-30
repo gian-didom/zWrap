@@ -9,7 +9,17 @@ openSSLLibDir = "";
 
 switch computer
     case 'MACA64'
-       
+        possiblePaths = getSystemLibPaths();
+        hasOpenSSL = cellfun(@(x) and(isfile(fullfile(x, 'libssl.a')), isfile(fullfile(x, 'libcrypto.a'))), possiblePaths);
+        if not(any(hasOpenSSL))
+            outFlag = false;
+            return;
+        end
+
+        outFlag = true;
+        openSSLLibDir = possiblePaths(find(hasOpenSSL, 1));
+        openSSLDir = fileparts(openSSLLibDir);
+        openSSLIncludeDir = fullfile(openSSLDir, 'include');
 
     case 'PCWIN64'
 

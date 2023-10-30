@@ -12,6 +12,8 @@ if isfield(zSettings, 'customArmPath') && isfile(fullfile(zSettings.customArmPat
     fprintf("ARM compiler found at %s\n", fullfile(zSettings.customArmPath, execFile));
     zEnv.armPath = zSettings.customArmPath;
     tmp = what(zEnv.armPath); zEnv.armPath = tmp.path;
+    zEnv.armGppBin = fullfile(zEnv.armPath, execFile);
+    zEnv.armGDBBin = fullfile(zEnv.armPath, strrep(execFile, 'g++', 'gdb'));
     return
 end
 
@@ -21,6 +23,8 @@ if  isfile(fullfile("tools", "arm-none-eabi", "bin", execFile))
     fprintf("ARM tools found at %s\n", fullfile("tools", "arm-none-eabi", "bin", execFile));
     zEnv.armPath = fullfile("tools", "arm-none-eabi", "bin");
     tmp = what(zEnv.armPath); zEnv.armPath = tmp.path;
+    zEnv.armGppBin = fullfile(zEnv.armPath, execFile);
+    zEnv.armGDBBin = fullfile(zEnv.armPath, strrep(execFile, 'g++', 'gdb'));
     return
 end
 
@@ -31,6 +35,8 @@ foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 if not(any(foundExec))
     warning("ARM tools not found. Please install from official website.")
     zEnv.armPath = "";
+    zEnv.armGppBin = "";
+    zEnv.armGDBBin = "";
     return
 end
 
@@ -41,11 +47,15 @@ if sum(foundExec) > 1
         fullfile(uniquePathList{find(foundExec,1)}));
     zEnv.armPath = fullfile(uniquePathList{find(foundExec,1)});
     tmp = what(zEnv.armPath); zEnv.armPath = tmp.path;
+    zEnv.armGppBin = fullfile(zEnv.armPath, execFile);
+    zEnv.armGDBBin = fullfile(zEnv.armPath, strrep(execFile, 'g++', 'gdb'));
 else
     % Found a unique ARM compiler.
     fprintf("Found ARM compiler at %s\n", ...
         fullfile(uniquePathList{find(foundExec,1)}));
     zEnv.armPath = fullfile(uniquePathList{find(foundExec,1)});
     tmp = what(zEnv.armPath); zEnv.armPath = tmp.path;
+    zEnv.armGppBin = fullfile(zEnv.armPath, execFile);
+    zEnv.armGDBBin = fullfile(zEnv.armPath, strrep(execFile, 'g++', 'gdb'));
 
 end

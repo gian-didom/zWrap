@@ -37,13 +37,12 @@ switch computer
             rmdir(extractDir);
 
             % Run configuration script
-            fprintbf("Running configuration script...\n");
-            [confFlag, none] = system(sprintf("cd %s && ./Configure", fullfile('tools', 'bootgen', 'openssl')), '-echo');
+            fprintbf("Running completed. Extracting...\n");
+            [confFlag, none] = system(sprintf("cd %s && ./Configure", fullfile('tools', 'bootgen', 'openssl')));
             assert(confFlag == 0, "Error during OpenSSL configuration");
 
             % Run makefile - this takes a loong time
-            fprintbf("Compiling OpenSSL...\n");
-            [compFlag, none] = system(sprintf("cd %s && %s", fullfile('tools', 'bootgen', 'openssl'), zEnv.makeBin), '-echo');
+            [compFlag, none] = system(sprintf("cd %s && %s", fullfile('tools', 'bootgen', 'openssl'), zEnv.makeBin));
             assert(compFlag == 0, "Error during OpenSSL compilation.");
 
             % Move built libraries
@@ -59,13 +58,11 @@ switch computer
             
             openSSLIncludeDir = fullfile(openSSLDir, "include");
             openSSLLibDir = fullfile(openSSLDir, "lib");
-            fprintbf("OpenSSL succesfully installed locally.\n");
 
         end
 
 
         % Download bootgen from source.
-        fprintbf("Downloading bootgen from GitHub...\n");
         downloadLink = 'https://github.com/Xilinx/bootgen/archive/refs/heads/master.zip';
         [dwnStatus, ~] = system(sprintf('curl -o "bootgen-master.zip" --output-dir %s -L "%s"', ...
                                                 fullfile('tools', 'temp'), ...
@@ -87,7 +84,7 @@ switch computer
         % <malloc.h>. Unfortunately Xilinx guys are not aware that the
         % stanard POSIX malloc is already defined in stdlib.hm and that not
         % every UNIX platform has a defined header for that...
-        fprintbf("Applying malloc fix for MacOS...\n");
+
         sourceFiles = dir(fullfile("tools", "bootgen")); sourceFiles = {sourceFiles.name};
         sourceFiles = sourceFiles(cellfun(@(x) contains(x, {'.c', '.h'}), sourceFiles).');
         cellfun(@(x) replaceInFile( ...
@@ -95,7 +92,6 @@ switch computer
             "#include <malloc.h>", ...
             "// #include <malloc.h>"), sourceFiles);
 
-        fprintbf("Building bootgen...\n");
         [compFlag, none] = system(sprintf('cd %s && %s "LIBS=-ldl -lpthread ''%s'' ''%s''" "INCLUDE_USER=-I %s"', ...
             fullfile('tools', 'bootgen'), ...
             zEnv.makeBin, ...

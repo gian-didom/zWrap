@@ -13,7 +13,7 @@ end
 if isfield(zSettings, 'customMakePath') && isfile(fullfile(zSettings.customMakePath, execFile))
     fprintf("GNU make found at %s\n", fullfile(zSettings.customMakePath, execFile));
     zEnv.makePath = zSettings.customMakePath;
-    
+    zEnv.makeBin = fullfile(zEnv.makePath, execFile);
     return
 end
 
@@ -22,7 +22,7 @@ if  isfile(fullfile("tools", "make", "bin", execFile))
     fprintf("GNU make found at %s\n", fullfile("tools", "make", "bin", execFile));
     zEnv.makePath = fullfile("tools", "make", "bin");
     tmp = what(zEnv.makePath); zEnv.makePath = tmp.path;
-    
+    zEnv.makeBin = fullfile(zEnv.makePath, execFile);
     return
 end
 
@@ -35,7 +35,7 @@ if not(any(foundExec))
     warning("GNU make not found. Please install GNU make from official website. " + ...
         "zWrap can run, but you won't be able to run makefiles.")
     zEnv.makePath = "";
-
+    zEnv.makeBin = "";
     
     return
 end
@@ -52,7 +52,7 @@ if sum(foundExec) > 1
 
     zEnv.makePath = fullfile(uniquePathList{find(foundExec,1)});
     tmp = what(zEnv.makePath); zEnv.makePath = tmp.path;
-    
+    zEnv.makeBin = fullfile(zEnv.makePath, execFile);
 else
     % Found a unique make.
     fprintf("Found GNU make at %s\n", ...
@@ -60,6 +60,7 @@ else
 
     zEnv.makePath = fullfile(uniquePathList{find(foundExec,1)});
     tmp = what(zEnv.makePath); zEnv.makePath = tmp.path;
+    zEnv.makeBin = fullfile(zEnv.makePath, execFile);
     
 
 end

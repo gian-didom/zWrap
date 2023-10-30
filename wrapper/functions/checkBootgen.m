@@ -15,6 +15,7 @@ if isfield(zSettings, 'customBootgenPath') && isfile(fullfile(zSettings.customBo
     fprintf("bootgen found at %s\n", fullfile(zSettings.customBootgenPath, execFile));
     zEnv.bootgenPath = zSettings.customBootgenPath;
     tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    zEnv.bootgenBin = fullfile(zEnv.bootgenPath, execFile);
     return
 end
 
@@ -23,6 +24,7 @@ if  isfile(fullfile("tools", "bootgen", execFile))
     fprintf("bootgen found at %s\n", fullfile("tools", "bootgen", execFile));
     zEnv.bootgenPath = fullfile("tools", "bootgen");
     tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    zEnv.bootgenBin = fullfile(zEnv.bootgenPath, execFile);
     return
 end
 
@@ -37,6 +39,7 @@ if not(any(foundExec))
     warning("bootgen not found. Please install bootgen from official website. " + ...
         "zWrap can run, but you won't be able to generate the SD card image.")
     zEnv.bootgenPath = "";
+    zEnv.bootgenBin = "";
     
     return
 end
@@ -53,6 +56,7 @@ if sum(foundExec) > 1
 
     zEnv.bootgenPath = fullfile(uniquePathList{find(foundExec,1)});
     tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    zEnv.bootgenBin = fullfile(zEnv.bootgenPath, execFile);
     
 else
     % Found a unique bootgen.
@@ -60,5 +64,6 @@ else
         fullfile(uniquePathList{find(foundExec,1)}));
     zEnv.bootgenPath = fullfile(uniquePathList{find(foundExec,1)});
     tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    zEnv.bootgenBin = fullfile(zEnv.bootgenPath, execFile);
     
 end
