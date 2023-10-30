@@ -104,25 +104,31 @@ fprintf('Running %s -I "%s" -c %s -o %s -g\n', ...
 assert(compilationStatus==0, "Error during compilation. Please check the console output.");
 
 %% Do for FULL_INPUT_STRUCT
-fprintf('\nRunning %s', sprintf("%s -q %s --batch --x %s\n", ...
+
+%================================================================== INPUTS
+fprintf('\nRunning %s', sprintf('"%s" -q "%s" --batch --x "%s"\n', ...
     gdb_path, output_test_file, fullfile('support', 'GDB_InputStructCommand.txt')));
 
-[~, outstring] = system(sprintf("%s -q %s --batch --x %s", ...
+[outFlag, outstring] = system(sprintf('"%s" -q "%s" --batch --x "%s"', ...
     gdb_path, output_test_file, fullfile('support', 'GDB_InputStructCommand.txt')));
+assert(outFlag == 0, "Error during GDB read.");
 
-if echo; fprintf(outstring); fprintf("\n\n\n\n"); end
+if echo; disp(outstring); fprintf("\n\n\n\n"); end
 outlines = splitlines(outstring);
 fullInputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+)', 'match'));
 if isempty(fullInputSizeGCC); fullInputSizeGCC = 0; end
 
+%================================================================== OUTPUTS
 % [~, outstring] = system(sprintf("%s -q getSizeAndOffsetsGDB.o --batch --ex 'ptype /o coder::FULL_INPUT_STRUCT._%s' --ex exit", gdb_path, codedInputs(1).name));
 % fprintf(outstring);
-fprintf('\nRunning %s', sprintf("%s -q %s --batch --x %s\n", ...
+fprintf('\nRunning %s', sprintf('"%s" -q "%s" --batch --x "%s"\n', ...
     gdb_path, output_test_file, fullfile('support', 'GDB_OutputStructCommand.txt')));
-[~, outstring] = system(sprintf("%s -q %s --batch --x %s", ...
+[outFlag, outstring] = system(sprintf('"%s" -q "%s" --batch --x "%s"', ...
     gdb_path, output_test_file, fullfile('support', 'GDB_OutputStructCommand.txt')));
 
-if echo; fprintf(outstring); end
+assert(outFlag == 0, "Error during GDB read.");
+
+if echo; disp(outstring); end
 outlines = splitlines(outstring);
 fullOutputSizeGCC = str2double(regexp(outlines{end-2}, '([0-9]+)', 'match'));
 if isempty(fullOutputSizeGCC); fullOutputSizeGCC = 0; end

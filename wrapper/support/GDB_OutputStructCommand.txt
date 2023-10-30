@@ -1,2 +1,1 @@
 ptype /o coder::FULL_OUTPUT_STRUCT
-exit

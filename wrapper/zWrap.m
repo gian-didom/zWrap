@@ -13,10 +13,7 @@ fprintbf("Checking dependencies...\n");
 zSettings = parsezArgs(varargin{:});
 
 %% STEP 0.1: Check if tools are available
-% Check OS
-checkARMTools();    % Checks path of ARM tools and adds the executable to zEnv
-checkGNUMake();     % Checks path of GNU make and adds the executable to zEnv
-checkBootgen();     % Checks path of bootgen and adds the executable to zEnv
+checkDependencies();
 
 %% TODO: Alternative, give CodeInfo and then base everything on that directory
 coder_project_path = zSettings.path;
@@ -105,12 +102,12 @@ targetFolderName = fullfile('out', sprintf("z%s", iss.fcnName));
 
 % 1. Create project folder
 if exist(targetFolderName, 'dir')
-     if zSettings.y 
+    if zSettings.y
         usrInput = 'y';
-     else 
-         usrInput = input(sprintf("<strong>Folder %s already exists, overwrite?</strong> [Y/n/k] [k]\n", ...
-        targetFolderName), "s");
-     end
+    else
+        usrInput = input(sprintf("<strong>Folder %s already exists, overwrite?</strong> [Y/n/k] [k]\n", ...
+            targetFolderName), "s");
+    end
 
 
     switch usrInput
@@ -120,7 +117,7 @@ if exist(targetFolderName, 'dir')
             rmpath(genpath(targetFolderName))
             rmdir(targetFolderName, 's')
             warning('on', 'MATLAB:rmpath:DirNotFound');
-            
+
         case {'K', 'k', ''}
             new_targetFolderName = targetFolderName;
             j=1;

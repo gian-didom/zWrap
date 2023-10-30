@@ -1,2 +1,1 @@
 ptype /o coder::FULL_INPUT_STRUCT
-exit

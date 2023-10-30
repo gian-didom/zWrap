@@ -1,26 +1,44 @@
 function checkBootgen()
 global zEnv zSettings
 
-execName = 'bootgen';
 
-if isfield(zSettings, 'customBootgenPath') && isfile(fullfile(zSettings.customBootgenPath, execName))
-    fprintf("bootgen found at %s", fullfile(zSettings.customBootgenPath, execName));
+
+switch computer
+    case {'MACA64', 'GLNXA64'}
+        execFile = 'bootgen';
+    case 'PCWIN64'
+        execFile = 'bootgen.exe';
+end
+
+% User specified the tool path and the tool is found inside
+if isfield(zSettings, 'customBootgenPath') && isfile(fullfile(zSettings.customBootgenPath, execFile))
+    fprintf("bootgen found at %s\n", fullfile(zSettings.customBootgenPath, execFile));
     zEnv.bootgenPath = zSettings.customBootgenPath;
+    tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
     return
 end
 
-        
+% Tool is found in local tools folder
+if  isfile(fullfile("tools", "bootgen", execFile))
+    fprintf("bootgen found at %s\n", fullfile("tools", "bootgen", execFile));
+    zEnv.bootgenPath = fullfile("tools", "bootgen");
+    tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    return
+end
+
+
 
 uniquePathList = getPossibleToolPaths();
 
 
 % Check if executable exists.
-foundExec = cellfun(@(x) isfile(fullfile(x, execName)), uniquePathList);
+foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 if not(any(foundExec))
-warning("bootgen not found. Please install bootgen from official website. " + ...
-    "zWrap can run, but you won't be able to generate the SD card image.")
-zEnv.bootgenPath = false;
-return
+    warning("bootgen not found. Please install bootgen from official website. " + ...
+        "zWrap can run, but you won't be able to generate the SD card image.")
+    zEnv.bootgenPath = "";
+    
+    return
 end
 
 
@@ -32,11 +50,15 @@ if sum(foundExec) > 1
 
     fprintf("Found bootgen at %s\n", ...
         fullfile(uniquePathList{find(foundExec,1)}));
+
     zEnv.bootgenPath = fullfile(uniquePathList{find(foundExec,1)});
+    tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    
 else
-    % Found a unique ARM compiler.
+    % Found a unique bootgen.
     fprintf("Found bootgen at %s\n", ...
         fullfile(uniquePathList{find(foundExec,1)}));
     zEnv.bootgenPath = fullfile(uniquePathList{find(foundExec,1)});
-
+    tmp = what(zEnv.bootgenPath); zEnv.bootgenPath = tmp.path;
+    
 end
