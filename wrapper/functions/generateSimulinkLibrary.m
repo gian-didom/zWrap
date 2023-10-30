@@ -1,7 +1,11 @@
 function outpath = generateSimulinkLibrary(iss, oss, savepath)
 global zSettings
 
-
+%% Clean
+if isfile(fullfile("temp", "bus_generator.m"))
+    delete(fullfile("temp", "bus_generator.m"));
+end
+%%
 
 maskCommandRun = "blockpos = get_param(gcb, 'Position'); block_w = blockpos(3)-blockpos(1); block_h = blockpos(4)-blockpos(2); image('support/run.png',[block_w/2-30, block_h/2-8, 60,16]);";
 maskCommandInput = "blockpos = get_param(gcb, 'Position'); block_w = blockpos(3)-blockpos(1); block_h = blockpos(4)-blockpos(2); image('support/serialize.svg',[block_w/2-20, block_h/2-20, 40,40]);";
@@ -20,16 +24,26 @@ args_struct = {};
 input_buses = {};
 temp_bus_file = fullfile('temp', 'bus_generator.m');
 
+input_buses = {};
 for j=1:numel(iss.Children)
     arg = iss.Children(j).getTemplate();
     if isstruct(arg)
         args_struct{end+1} = arg;
+        if isfile(temp_bus_file)
+            delete(temp_bus_file)
+        end
         bus = Simulink.Bus.createObject(arg, temp_bus_file);
+        bus_file_content = fileread(temp_bus_file);
+        [sI, eI] = regexp(bus_file_content, "cellInfo = {(.*)}';");
         bus.index = j;
-        fid = fopen(temp_bus_file, 'r');
-        bus_file_content = fread(fid);
-        fclose(fid);
-        bus.cellrep = Simulink.Bus.objectToCell(bus.busName);
+        if isempty(sI) || isempty(eI)
+            warning("Failed to add bus %s to the model. Please debug.",  bus.busName);
+            bus.cellrep = '';
+            bus.cellname = '';
+        else
+            bus.cellname = sprintf("cellInfo_%s", bus.busName);
+            bus.cellrep = strrep(bus_file_content(sI:eI), 'cellInfo', bus.cellname);
+        end
         input_buses{end+1} = bus;
     end
 end
@@ -43,7 +57,6 @@ for j=1:numel(oss.Children)
             delete(temp_bus_file)
         end
         bus = Simulink.Bus.createObject(arg, temp_bus_file);
-        fid = fopen(temp_bus_file, 'r');
         bus_file_content = fileread(temp_bus_file);
         [sI, eI] = regexp(bus_file_content, "cellInfo = {(.*)}';");
         bus.index = j;
@@ -273,4 +286,9 @@ set_param(subsystem_path, 'InitFcn', initfcn_string);
 
 %% Save library
 save_system(modelname, savepath);
+
+%% Clean
+if isfile(fullfile("temp", "bus_generator.m"))
+    delete(fullfile("temp", "bus_generator.m"));
+end
 end
