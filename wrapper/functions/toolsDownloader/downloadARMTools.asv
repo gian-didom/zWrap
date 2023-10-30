@@ -33,18 +33,12 @@ switch computer
 
         % Untar the package
         fprintf("Download completed. Extracting...\n");
-        extractedFiles = unzip(fullfile('tools', 'temp', 'armCompilerLatest.zip'), fullfile('tools', 'arm-none-eabi'));
+        unzip(fullfile('tools', 'temp', 'armCompilerLatest.zip'), fullfile('tools', 'arm-none-eabi'));
         fprintf("Extraction complete.");
-
-        % Reshape dirs, everything up one level
-        extractDir = extractedFiles{1};
-        movefile(sprintf("%s*", extractDir), fullfile('tools', 'arm-none-eabi'));
-        rmdir(extractDir);
         
         % Clean
         delete(fullfile('tools', 'temp', 'armCompilerLatest.zip'));
         fprintf("ARM GNU Compiler and tools succesfully installed in %s", fullfile('tools', 'arm-none-eabi'));
-
     case 'GLNXA64'
 
 end
