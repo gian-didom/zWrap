@@ -5,21 +5,39 @@ function [outputArg1,outputArg2] = downloadGNUMake()
 switch computer
     case 'MACA64'
         % Download
-        downloadLink = 'https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-mac.tar.bz2?rev=58ed196feb7b4ada8288ea521fa87ad5&hash=62C9BE56E5F15D7C2D98F48BFCF2E839D7933597';
-        [dwnStatus, ~] = system(sprintf('curl -# -o "armCompilerLatest.tar.bz2" --output-dir %s -L "%s"', ...
+        downloadLink = 'https://github.com/wkusnierczyk/make/archive/refs/heads/master.zip';
+        [dwnStatus, ~] = system(sprintf('curl -o "make-master.zip" --output-dir %s -L "%s"', ...
                                                 fullfile('tools', 'temp'), ...
                                                 downloadLink), ...
                                         "-echo");
-        assert(dwnStatus == 0, "Error in downloading the ARM tools.")
+        assert(dwnStatus == 0, "Error in downloading GNU Make.")
 
         % Untar the package
         fprintf("Download completed. Extracting...\n");
-        system(sprintf('tar -xvf %s -C %s --strip-components=1', fullfile('tools', 'temp', 'armCompilerLatest.tar.bz2'), fullfile('tools', 'arm-none-eabi')))
+        system(sprintf('tar -xvf %s -C %s --strip-components=1', ...
+            fullfile('tools', 'temp', 'make-master.zip'), ...
+            fullfile('tools', 'make')))
         fprintf("Extraction complete.");
+
+        % Run configuration script
+        fprintbf("Running configuration script...\n");
+        [confFlag, ~] = system(sprintf("cd %s && ./configure", fullfile('tools', 'make')), '-echo');
+        assert(confFlag == 0, "Error during GNU make configuration");
+
+        % Run makefile - this takes a loong time
+        fprintbf("Building make...\n");
+        [compFlag, ~] = system(sprintf("cd %s && ./build.sh", fullfile('tools', 'make')), '-echo');
+        assert(compFlag == 0, "Error during GNU make building.");
+
+        % Try to execute make
+        fprintbf("Trying to run make:\n");
+        outFlag = system(sprintf("%s -version", fullfile("tools", "make", "make")));
+        assert(outFlag == 0, "It seems that make compiled but couldn't be ran. " + ...
+            "Please perform the installation manually.")
         
         % Clean
-        delete(fullfile('tools', 'temp', 'armCompilerLatest.tar.bz2'));
-        fprintf("ARM GNU Compiler and tools succesfully installed in %s", fullfile('tools', 'arm-none-eabi'));
+        delete(fullfile('tools', 'temp', 'make-master.zip'));
+        fprintbf("GNU Make succesfully installed in %s\n", fullfile('tools', 'make'));
 
     case 'PCWIN64'
         downloadLink = 'https://downloads.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-bin.zip';

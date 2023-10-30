@@ -43,7 +43,7 @@ switch computer
         
         % Clean
         delete(fullfile('tools', 'temp', 'armCompilerLatest.zip'));
-        fprintbf("ARM GNU Compiler and tools succesfully installed in %s", fullfile('tools', 'arm-none-eabi'));
+        fprintf("ARM GNU Compiler and tools succesfully installed in %s", fullfile('tools', 'arm-none-eabi'));
 
     case 'GLNXA64'
 
