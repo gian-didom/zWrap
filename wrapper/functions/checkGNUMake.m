@@ -34,8 +34,8 @@ foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 if not(any(foundExec))
     warning("GNU make not found. Please install GNU make from official website. " + ...
         "zWrap can run, but you won't be able to run makefiles.")
-    zEnv.makePath = "";
-    zEnv.makeBin = "";
+    zEnv.makePath = '';
+    zEnv.makeBin = '';
     
     return
 end

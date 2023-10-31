@@ -38,8 +38,8 @@ foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 if not(any(foundExec))
     warning("bootgen not found. Please install bootgen from official website. " + ...
         "zWrap can run, but you won't be able to generate the SD card image.")
-    zEnv.bootgenPath = "";
-    zEnv.bootgenBin = "";
+    zEnv.bootgenPath = '';
+    zEnv.bootgenBin = '';
     
     return
 end

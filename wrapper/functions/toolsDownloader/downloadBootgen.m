@@ -50,9 +50,9 @@ switch computer
             % Move built libraries
             mkdir(fullfile("tools", "bootgen", "openssl", "lib"));
             movefile(fullfile("tools", "bootgen", "openssl", "libcrypto.a"), ...
-                fullfile("tools", "bootgen", "openssl", "lib", "libcrypto.a"));
+                fullfile("tools", "bootgen", "openssl", "lib", "libcrypto.a"), 'f');
             movefile(fullfile("tools", "bootgen", "openssl", "libssl.a"), ...
-                fullfile("tools", "bootgen", "openssl", "lib", "libssl.a"));
+                fullfile("tools", "bootgen", "openssl", "lib", "libssl.a"), 'f');
 
             % Finished downloading OpenSSL - set variables
             openSSLDir = fullfile("tools", "bootgen", "openssl"); 
@@ -160,7 +160,7 @@ switch computer
 
         % Reshape dirs, everything up one level
         extractDir = extractedFiles{1};
-        movefile(sprintf("%s*", extractDir), fullfile('tools', 'bootgen'));
+        movefile(sprintf("%s*", extractDir), fullfile('tools', 'bootgen'), 'f');
         rmdir(extractDir);
 
         % BUGFIX: Remove this because the OpenSSL installation does NOT

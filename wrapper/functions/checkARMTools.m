@@ -34,9 +34,9 @@ uniquePathList = getPossibleToolPaths();
 foundExec = cellfun(@(x) isfile(fullfile(x, execFile)), uniquePathList);
 if not(any(foundExec))
     warning("ARM tools not found. Please install from official website.")
-    zEnv.armPath = "";
-    zEnv.armGppBin = "";
-    zEnv.armGDBBin = "";
+    zEnv.armPath = '';
+    zEnv.armGppBin = '';
+    zEnv.armGDBBin = '';
     return
 end
 

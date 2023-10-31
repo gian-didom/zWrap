@@ -47,7 +47,6 @@ sourceLines{end+1}  = sprintf("\n#ifndef RTWTYPES_H\n");
 sourceLines{end+1}  = sprintf("#include ""rtwtypes.h""\n\n");
 sourceLines{end+1}  = sprintf("#endif\n\n");
 
-
 sourceLines{end+1} = sprintf("namespace coder {");
 
 % ================= Full input structure definition - in namespace coder
