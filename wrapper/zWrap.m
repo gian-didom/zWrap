@@ -1,12 +1,13 @@
 function [outputArg1,outputArg2] = zWrap(varargin)
 global zSettings zEnv
+clear zSettings;
+clear zEnv;
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 addpath(genpath('classes'));
 addpath(genpath('functions'));
 
 fprintbf("Checking dependencies...\n");
-
 
 
 %% Parse inputs
