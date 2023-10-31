@@ -3,6 +3,7 @@
 #
 
 -include ../../fname.mk
+-include ../../compiler.mk
 #
 # tools
 #

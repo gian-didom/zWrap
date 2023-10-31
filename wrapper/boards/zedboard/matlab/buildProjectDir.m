@@ -1,4 +1,5 @@
 function buildProjectDir(fcnName, targetFolderName, packDir, iss, oss)
+global zEnv
 
 % 2. Add the "zed" folder to the project folder
 copyfile(fullfile("boards", "zedboard", "bsp", "zed", "*"), ...
@@ -44,6 +45,12 @@ copyfile(fullfile(targetFolderName, "generated", "callFunction.h"), ...
 % Create the fname.mk file in the folder
 mkString = sprintf("FUNCTION_NAME = %s", fcnName);
 fid = fopen(fullfile(targetFolderName, 'project', "fname.mk"), "w");
+fprintf(fid, mkString);
+fclose(fid);
+
+% Create the compiler.mk file in the folder
+mkString = sprintf("ARM_GCC = %s\nARM_GPP = %s", strrep(zEnv.armGppBin, 'g++', 'gcc'), zEnv.armGppBin);
+fid = fopen(fullfile(targetFolderName, 'project', "compiler.mk"), "w");
 fprintf(fid, mkString);
 fclose(fid);
 

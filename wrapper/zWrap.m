@@ -1,7 +1,8 @@
 function [outputArg1,outputArg2] = zWrap(varargin)
-global zSettings zEnv
 clear zSettings;
 clear zEnv;
+global zSettings zEnv
+
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 addpath(genpath('classes'));
@@ -204,7 +205,13 @@ SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', i
 generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
 fprintbf('Simulink library succesfully created at %s!\n', SimulinkLibraryPath)
 
-
+%% RUN makefiles
+buildVar = 'Debug';
+[makeFlag] = system(sprintf("cd %s %s %s", ...
+                                fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar), ...
+                                cmdsep, ...
+                                zEnv.makeBin), ...
+                        "-echo");
 %% RUN TESTS
 
 % Test 1: hard-coded memory address is the one obtained from the Core 1

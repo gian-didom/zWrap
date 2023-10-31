@@ -4,6 +4,7 @@
 
 
 -include ../../fname.mk
+-include ../../compiler.mk
 
 ifndef FUNCTION_NAME
 FUNCTION_NAME = app
@@ -52,7 +53,7 @@ main-build: $(FUNCTION_NAME)_core1.elf secondary-outputs
 $(FUNCTION_NAME)_core1.elf: $(OBJS) ../src/lscript.ld $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM v7 gcc linker'
-	arm-none-eabi-g++ -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,--print-memory-usage -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bsplib/lib -o "$(FUNCTION_NAME)_core1.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(ARM_GPP) -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,--print-memory-usage -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bsplib/lib -o "$(FUNCTION_NAME)_core1.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
