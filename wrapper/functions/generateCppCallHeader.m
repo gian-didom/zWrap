@@ -99,16 +99,16 @@ if strcmp(inputObj.Coder, "Simulink")
 
     % Define dwork
     CppScript = vertcat(CppScript, ...
-    sprintf("static DW dwork;")); 
+    sprintf("DW dwork;")); 
 
     % Define RT_MODEL
     CppScript = vertcat(CppScript, ...
-    sprintf("static RT_MODEL RTM;")); 
+    sprintf("RT_MODEL RTM;")); 
 
    
     % Define model initialization variable
     CppScript = vertcat(CppScript, ...
-    sprintf("static bool MODEL_INITIALIZED = false;")); 
+    sprintf("bool MODEL_INITIALIZED = false;")); 
 end
 
 
