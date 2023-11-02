@@ -50,6 +50,14 @@ fprintbf('All code succesfully packed in %s', packDir);
 printDone();
 
 
+% Comment out main functions
+if isfile(fullfile(packDir, 'ert_main.c'))
+    movefile(fullfile(packDir, 'ert_main.c'), fullfile(packDir, 'ert_main.cbak'));
+end
+
+if isfile(fullfile(packDir, 'ert_main.h'))
+    movefile(fullfile(packDir, 'ert_main.h'), fullfile(packDir, 'ert_main.hbak'));
+end
 %% GET INPUT OBJECT
 fprintbf('Building interface structure objects...');
 
@@ -81,8 +89,8 @@ codedOutputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
     nameOutputs, typeOutputs, sizeOutputs);
 
 % Clean the ones not used in iss
-% index_found = arrayfun(@(s) any(strcmp(s.name, vertcat(iss.Children.argNames))), codedInputs);
-% codedInputs = codedInputs(index_found);
+index_found = arrayfun(@(s) any(strcmp(s.name, vertcat(iss.Children.argNames))), codedInputs);
+codedInputs = codedInputs(index_found);
 
 echo = true;
 [GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, codedOutputs, packDir, echo);
