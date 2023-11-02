@@ -27,6 +27,7 @@ classdef (HandleCompatible) coderBoundedMatrixCollection < coderBoundedMatrix
             obj.Name = name;
             obj.DataType.Name = strcat(obj.Name, '_data');
             obj.SizeType.Name = strcat(obj.Name, '_size');
+            obj.argNames = {obj.DataType.Name; obj.SizeType.Name};
         end
 
 

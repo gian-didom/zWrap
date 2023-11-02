@@ -1,2 +1,3 @@
-ARM_GCC = armGppPath
-ARM_GPP = armGppPath
+ARM_GCC = {{armGppPath}}
+ARM_GPP = {{armGppPath}}
+BOOTGEN = {{bootgenPath}}

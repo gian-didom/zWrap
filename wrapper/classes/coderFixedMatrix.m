@@ -7,16 +7,16 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
     end
 
     methods
-%%        function obj = coderFixedMatrix(codeInfoObj)
+        %%        function obj = coderFixedMatrix(codeInfoObj)
 
         function obj = coderFixedMatrix(codeInfoObj)
-
+            obj@coderMatrix(codeInfoObj);
             obj.Name = codeInfoObj.Identifier;
 
 
             %UNTITLED8 Construct an instance of this class
             %   Detailed explanation goes here
-            obj.Dimension = codeInfoObj.Dimensions;           
+            obj.Dimension = codeInfoObj.Dimensions;
             obj.NumEl = prod(obj.Dimension);
             obj.BaseType = coderArgument.processObject2(codeInfoObj.BaseType);
             obj.Type = obj.BaseType.Type;
@@ -30,7 +30,7 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
         end
 
 
-%%         function outvar = getTemplate(obj)
+        %%         function outvar = getTemplate(obj)
 
         function outvar = getTemplate(obj)
             % This is a structure with certain fields. In order to get the
@@ -40,7 +40,7 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
             else
                 for j=1:obj.NumEl
                     outvar(j) = obj.BaseType.getTemplate();
-                end               
+                end
             end
 
             if numel(obj.Dimension) > 1
@@ -52,24 +52,24 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
 
 
 
-%%        function td = getCppDeclaration(obj)
+        %%        function td = getCppDeclaration(obj)
 
         function td = getCppDeclaration(obj)
             switch obj.Coder
 
                 case 'MATLAB'
-            td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
-                sprintf("[%i]", flip(obj.Dimension)), ...
-                ";");
+                    td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
+                        sprintf("[%i]", flip(obj.Dimension)), ...
+                        ";");
                 case 'Simulink'
-td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
-                sprintf("[%i]", prod(obj.Dimension)), ...
-                ";");
+                    td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
+                        sprintf("[%i]", prod(obj.Dimension)), ...
+                        ";");
             end
 
         end
 
-%%         function size = getTotalSize(obj)
+        %%         function size = getTotalSize(obj)
 
         function size = getTotalSize(obj)
             dataSize = obj.BaseType.getTotalSizePadded();
@@ -77,8 +77,8 @@ td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
             obj.ByteSize = size;
         end
 
-%%         function paddedSize = getTotalSizePadded(obj)
-        
+        %%         function paddedSize = getTotalSizePadded(obj)
+
         function paddedSize = getTotalSizePadded(obj)
             obj.BaseType.getTotalSizePadded();
             paddedSize = obj.getTotalSize();
@@ -87,7 +87,7 @@ td = strcat(sprintf("%s %s", obj.BaseType.Type, obj.Name), ...
 
 
 
-%%         function [fcn, checkFcn] = getMappingFunction(obj)
+        %%         function [fcn, checkFcn] = getMappingFunction(obj)
 
         function [fcn, checkFcn] = getMappingFunction(obj)
             %METHOD1 Summary of this method goes here

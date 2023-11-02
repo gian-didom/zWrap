@@ -5,6 +5,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
     %% 
     properties (SetObservable)
         Name = ''
+        argNames = {}
         Type = ''
         MATLABType = ''
         MATLABCastType = ''
@@ -26,6 +27,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         Role = ''
         originalObject
         Coder = 'MATLAB'
+        passedBy = 'value'  %'value' or 'pointer'
     end
 
     %% 
@@ -42,12 +44,21 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
 
         function obj = setName(obj, name)
             obj.Name = name;
+            if isempty(obj.argNames) || isempty(obj.argNames{1})
+                obj.argNames = {obj.Name};
+            end
+
         end
 
         function name = getCppArgumentForCall(obj, baseName)
-
-            name = strcat(baseName, '->', obj.Name);
             
+            switch obj.passedBy
+                case 'pointer'
+            name = strcat('&(', baseName, '->', obj.Name, ')');
+
+                otherwise
+            name = strcat(baseName, '->', obj.Name);
+            end
             
         end
 
@@ -234,7 +245,9 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                         else
                             error('No Identifier field in structure');
                         end
+                        
                         outobj = coderArgument.processObject2(impl.Type);
+
                         % Augment with name information
                         outobj.setName(impl.(idFieldName));
                         outobj.MATLABName = impl.(idFieldName);
@@ -262,7 +275,8 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
 
                     case {'coder.types.Struct', 'coder.types.Class'}
                         % Check wether it is a structure or a cell
-                        outobj = coderNestedObject.create(inobj);
+                        objTargetClass = coderNestedObject.disambiguate(inobj);
+                        outobj = objTargetClass(inobj);
 
                     case 'coder.types.Matrix'
                         % This is the matrix type, but for the 1x1 case it
@@ -270,7 +284,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                         if all(inobj.Dimensions == 1)
                             outobj = coderPrimitive(inobj.BaseType);
                         else
-                        outobj = coderFixedMatrix(inobj);
+                            outobj = coderFixedMatrix(inobj);
                         end
 
                     otherwise

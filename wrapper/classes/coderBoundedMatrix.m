@@ -12,6 +12,7 @@ classdef (HandleCompatible, Abstract) coderBoundedMatrix < coderMatrix
 
         %% function obj = coderBoundedMatrix(dataObj, sizeObj)
         function obj = coderBoundedMatrix(dataObj, sizeObj)
+            obj@coderMatrix(dataObj);
             % All bounded matrices have a dataObj and a sizeObj.
             % obj.Name = codeInfoObj.Identifier;
             obj.DataType = coderArgument.processObject2(dataObj.Type);

@@ -49,7 +49,10 @@ fprintf(fid, mkString);
 fclose(fid);
 
 % Create the compiler.mk file in the folder
-mkString = sprintf("ARM_GCC = %s\nARM_GPP = %s", strrep(zEnv.armGppBin, 'g++', 'gcc'), zEnv.armGppBin);
+mkString = sprintf("ARM_GCC = %s\nARM_GPP = %s\nBOOTGEN = %s", ...
+    strrep(zEnv.armGppBin, 'g++', 'gcc'), ...
+    zEnv.armGppBin, ...
+    zEnv.bootgenBin);
 fid = fopen(fullfile(targetFolderName, 'project', "compiler.mk"), "w");
 fprintf(fid, mkString);
 fclose(fid);

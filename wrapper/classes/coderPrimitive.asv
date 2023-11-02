@@ -10,7 +10,6 @@ classdef (HandleCompatible) coderPrimitive < coderArgument
         function obj = coderPrimitive(codeInfoObj)
             %UNTITLED10 c an instance of this class
             %   Detailed explanation goes here
-            obj@coderArgument(codeInfoObj);
             obj.Padding = 0;
             obj.Children = [];
             obj.ByteSize = ceil(double(codeInfoObj.WordLength)/8);
@@ -19,6 +18,7 @@ classdef (HandleCompatible) coderPrimitive < coderArgument
             end
             obj.Type = codeInfoObj.Identifier;
             obj.MATLABType = codeInfoObj.Name;
+            obj.set
             obj.setMATLABCastType();
             obj.AlignmentRequirement = obj.ByteSize;
         end
@@ -28,10 +28,6 @@ classdef (HandleCompatible) coderPrimitive < coderArgument
             % fields, we get the Children.
             outvar = cast(0, obj.MATLABType);
         end
-
-        %% function setName(name)
-        
-
 
 
         %%

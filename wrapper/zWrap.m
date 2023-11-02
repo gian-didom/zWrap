@@ -81,8 +81,8 @@ codedOutputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
     nameOutputs, typeOutputs, sizeOutputs);
 
 % Clean the ones not used in iss
-index_found = arrayfun(@(s) any(strcmp(s.name, {iss.Children.Name})), codedInputs);
-codedInputs = codedInputs(index_found);
+% index_found = arrayfun(@(s) any(strcmp(s.name, vertcat(iss.Children.argNames))), codedInputs);
+% codedInputs = codedInputs(index_found);
 
 echo = true;
 [GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, codedOutputs, packDir, echo);

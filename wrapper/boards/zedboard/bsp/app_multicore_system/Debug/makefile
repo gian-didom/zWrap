@@ -41,13 +41,13 @@ build:
 package:
 	-clean 
 	@echo Generating bif file for the system project
-	echo "the_ROM_image:" > $(FUNCTION_NAME).bif
-	echo "{" >> $(FUNCTION_NAME).bif
-	echo "[bootloader] ../../zed/zynq_fsbl/fsbl.elf" >> $(FUNCTION_NAME).bif
-	echo "../../$(FUNCTION_NAME)_core0/Debug/$(FUNCTION_NAME)_core0.elf" >> $(FUNCTION_NAME).bif
-	echo "../../$(FUNCTION_NAME)_core1/Debug/$(FUNCTION_NAME)_core1.elf" >> $(FUNCTION_NAME).bif
-	echo "}" >> $(FUNCTION_NAME).bif
-	bootgen -image $(FUNCTION_NAME).bif -arch zynq -w on -o BOOT.BIN
+	@echo "the_ROM_image:" > $(FUNCTION_NAME).bif
+	@echo "{" >> $(FUNCTION_NAME).bif
+	@echo "[bootloader] ../../zed/zynq_fsbl/fsbl.elf" >> $(FUNCTION_NAME).bif
+	@echo "../../$(FUNCTION_NAME)_core0/Debug/$(FUNCTION_NAME)_core0.elf" >> $(FUNCTION_NAME).bif
+	@echo "../../$(FUNCTION_NAME)_core1/Debug/$(FUNCTION_NAME)_core1.elf" >> $(FUNCTION_NAME).bif
+	@echo "}" >> $(FUNCTION_NAME).bif
+	$(BOOTGEN) -image $(FUNCTION_NAME).bif -arch zynq -w on -o BOOT.BIN
 
 
 clean:

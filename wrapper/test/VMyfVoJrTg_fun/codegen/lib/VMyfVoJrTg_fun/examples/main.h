@@ -1,15 +1,15 @@
-//
-// Academic License - for use in teaching, academic research, and meeting
-// course requirements at degree granting institutions only.  Not for
-// government, commercial, or other organizational use.
-// File: main.h
-//
-// MATLAB Coder version            : 23.2
-// C/C++ source code generated on  : 27-Oct-2023 11:24:57
-//
+/*
+ * Academic License - for use in teaching, academic research, and meeting
+ * course requirements at degree granting institutions only.  Not for
+ * government, commercial, or other organizational use.
+ * File: main.h
+ *
+ * MATLAB Coder version            : 23.2
+ * C/C++ source code generated on  : 02-Nov-2023 11:00:55
+ */
 
 /*************************************************************************/
-/* This automatically generated example C++ main file shows how to call  */
+/* This automatically generated example C main file shows how to call    */
 /* entry-point functions that MATLAB Coder generated. You must customize */
 /* this file for your application. Do not modify this file directly.     */
 /* Instead, make a copy of this file, modify it, and integrate it into   */
@@ -36,19 +36,27 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-// Include Files
+/* Include Files */
 #include "rtwtypes.h"
-#include <cstddef>
-#include <cstdlib>
+#include <stddef.h>
+#include <stdlib.h>
 
-// Function Declarations
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Function Declarations */
 extern int main(int argc, char **argv);
 
-extern void main_VMyfVoJrTg_fun();
+extern void main_VMyfVoJrTg_fun(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
-//
-// File trailer for main.h
-//
-// [EOF]
-//
+/*
+ * File trailer for main.h
+ *
+ * [EOF]
+ */

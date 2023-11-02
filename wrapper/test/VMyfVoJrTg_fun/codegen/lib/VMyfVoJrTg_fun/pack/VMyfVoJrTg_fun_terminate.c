@@ -2,23 +2,26 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: VMyfVoJrTg_fun_data.h
+ * File: VMyfVoJrTg_fun_terminate.c
  *
  * MATLAB Coder version            : 23.2
  * C/C++ source code generated on  : 02-Nov-2023 11:00:55
  */
 
-#ifndef VMYFVOJRTG_FUN_DATA_H
-#define VMYFVOJRTG_FUN_DATA_H
-
 /* Include Files */
-#include "rtwtypes.h"
-#include <stddef.h>
-#include <stdlib.h>
+#include "VMyfVoJrTg_fun_terminate.h"
 
-#endif
+/* Function Definitions */
 /*
- * File trailer for VMyfVoJrTg_fun_data.h
+ * Arguments    : void
+ * Return Type  : void
+ */
+void VMyfVoJrTg_fun_terminate(void)
+{
+}
+
+/*
+ * File trailer for VMyfVoJrTg_fun_terminate.c
  *
  * [EOF]
  */

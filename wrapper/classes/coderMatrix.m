@@ -10,10 +10,8 @@ classdef (HandleCompatible) coderMatrix < coderArgument
     end
 
     methods
-        function obj = coderMatrix(~)
-            if nargin == 0
-                return
-            end
+        function obj = coderMatrix(typeObj)
+            obj@coderArgument(typeObj);
 
 
         end

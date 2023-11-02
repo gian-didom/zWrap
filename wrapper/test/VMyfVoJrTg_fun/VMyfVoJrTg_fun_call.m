@@ -1,6 +1,8 @@
 oyvELPSlUC = double(0);
 eguWQhvSLY = char(zeros(1697,475));
 FieEkIcymP(1).AlGyAsIvgK = int32(zeros(51,9,36,22,1));
+coder.varsize('FieEkIcymP(:).AlGyAsIvgK');
+
 FieEkIcymP(1).zZyADJpHqO = logical(zeros(2,66,508,3));
 FieEkIcymP(1).BlXEngBqzH = logical(zeros(8,12,21,376));
 FieEkIcymP(1).CdCkoejhss = int32(0);
@@ -52,6 +54,8 @@ JFDmJNevGZ{19} = EylrsMyQjY;
 MwGiqcwLPk = char(0);
 JFDmJNevGZ{20} = MwGiqcwLPk;
 VMyfVoJrTg_fun(oyvELPSlUC,eguWQhvSLY,FieEkIcymP,TWgrWEqeae,JFDmJNevGZ);
+
+codegen test/VMyfVoJrTg_fun/VMyfVoJrTg_fun.m -config config -args {oyvELPSlUC,eguWQhvSLY,FieEkIcymP,TWgrWEqeae,JFDmJNevGZ}
 
 % codegen VMyfVoJrTg_fun -args {oyvELPSlUC,eguWQhvSLY,FieEkIcymP,TWgrWEqeae,JFDmJNevGZ}
 

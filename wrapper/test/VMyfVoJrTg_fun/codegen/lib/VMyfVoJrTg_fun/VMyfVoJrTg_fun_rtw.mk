@@ -2,7 +2,7 @@
 ## Makefile generated for component 'VMyfVoJrTg_fun'. 
 ## 
 ## Makefile     : VMyfVoJrTg_fun_rtw.mk
-## Generated on : Fri Oct 27 11:22:26 2023
+## Generated on : Thu Nov 02 10:52:22 2023
 ## Final product: ./VMyfVoJrTg_fun.a
 ## Product type : static-library
 ## 
@@ -22,8 +22,8 @@ MAKEFILE                  = VMyfVoJrTg_fun_rtw.mk
 MATLAB_ROOT               = /Applications/MATLAB_R2023b.app
 MATLAB_BIN                = /Applications/MATLAB_R2023b.app/bin
 MATLAB_ARCH_BIN           = $(MATLAB_BIN)/maca64
-START_DIR                 = /Users/gianfry/Documents/DLR/zWrap_legacy/wrapper/test/VMyfVoJrTg_fun
-TGT_FCN_LIB               = ISO_C++11
+START_DIR                 = /Users/gianfry/Documents/DLR/zWrap/wrapper/test/VMyfVoJrTg_fun
+TGT_FCN_LIB               = ISO_C
 SOLVER_OBJ                = 
 CLASSIC_INTERFACE         = 0
 MODEL_HAS_DYNAMICALLY_LOADED_SFCNS = 
@@ -172,7 +172,7 @@ DEFINES = $(DEFINES_CUSTOM) $(DEFINES_STANDARD)
 ## SOURCE FILES
 ###########################################################################
 
-SRCS = $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_initialize.cpp $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_terminate.cpp $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun.cpp
+SRCS = $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_initialize.c $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_terminate.c $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun.c
 
 ALL_SRCS = $(SRCS)
 
@@ -200,7 +200,7 @@ LIBS =
 ## SYSTEM LIBRARIES
 ###########################################################################
 
-SYSTEM_LIBS =  -lm -lstdc++
+SYSTEM_LIBS =  -lm
 
 ###########################################################################
 ## ADDITIONAL TOOLCHAIN FLAGS
@@ -431,16 +431,16 @@ $(PRODUCT) : $(OBJS) $(PREBUILT_OBJS)
 	$(CPP) $(CPPFLAGS) -o "$@" "$<"
 
 
-VMyfVoJrTg_fun_initialize.o : $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_initialize.cpp
-	$(CPP) $(CPPFLAGS) -o "$@" "$<"
+VMyfVoJrTg_fun_initialize.o : $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_initialize.c
+	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-VMyfVoJrTg_fun_terminate.o : $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_terminate.cpp
-	$(CPP) $(CPPFLAGS) -o "$@" "$<"
+VMyfVoJrTg_fun_terminate.o : $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun_terminate.c
+	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-VMyfVoJrTg_fun.o : $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun.cpp
-	$(CPP) $(CPPFLAGS) -o "$@" "$<"
+VMyfVoJrTg_fun.o : $(START_DIR)/codegen/lib/VMyfVoJrTg_fun/VMyfVoJrTg_fun.c
+	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
 ###########################################################################

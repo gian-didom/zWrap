@@ -43,13 +43,13 @@ classdef (HandleCompatible) coderClass < coderNestedObject
 
 
     methods(Static)
-        function outobj = create(typeObj)
+        function outClass = disambiguate(typeObj)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             switch typeObj.Identifier
                 case 'bounded_array'
                     % It is not a real class. It is a bounded matrix.
-                    outobj = coderBoundedMatrixClass(typeObj);
+                    outClass = @coderBoundedMatrixClass;
                 otherwise
                     % It could be a String, maybe?
                     if coderClass.checkIsString(typeObj)
@@ -57,11 +57,11 @@ classdef (HandleCompatible) coderClass < coderNestedObject
                         % objects. However, they have a different
                         % implementation for the streaming and building
                         % function.
-                        outobj = coderString(typeObj);
+                        outClass = @coderString;
                     else
 
                     % Then it's a generic class
-                    outobj = coderClass(typeObj);
+                    outClass = @coderClass;
                     end
             end
         end

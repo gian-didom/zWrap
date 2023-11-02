@@ -14,7 +14,7 @@ for j=1:numel(codeInfo.Inports)
     elseif isprop(impl, 'ElementIdentifier')
         idFieldName = 'ElementIdentifier';
     else
-        error('No Identifier field in structure');
+        warning('No Identifier field in structure');
     end
 
     % Check if single or multi
