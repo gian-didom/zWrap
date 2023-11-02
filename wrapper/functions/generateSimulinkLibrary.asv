@@ -87,15 +87,13 @@ config.FunctionScript = fileread(sprintf('z%s/simulink/%s_inputSerializer.m', is
 
 % Add mask - add try/catch since it is non-critical
 try
-    inputMask = Simulink.Mask.create(sprintf('%s/inputSerializer', subsystem_path));
-    inputMask.IconUnits = 'pixels';
-    inputMask.Display = maskCommandInput;
-    if isfield (inputMask, 'SaveImageFileWithModel')
-        inputMask.SaveImageFileWithModel = 'on';
-    end
-catch err
-    warning("Input serialized mask creation failed with error: %s", err);
+inputMask = Simulink.Mask.create(sprintf('%s/inputSerializer', subsystem_path));
+inputMask.IconUnits = 'pixels';
+inputMask.Display = maskCommandInput;
+if ismethod (inputMask, 'SaveImageFileWithModel')
+inputMask.SaveImageFileWithModel = 'on';
 end
+except
 
 
 
@@ -120,17 +118,10 @@ for j=1:numel(output_buses)
     stateflowBlock.Outputs(outputIndex).DataType = sprintf("Bus: %s", bus.busName);
 end
 
-% Output mask - in try-catch because non-critical
-try
-    outputMask = Simulink.Mask.create(sprintf('%s/outputParser', subsystem_path));
-    outputMask.IconUnits = 'pixels';
-    outputMask.Display = maskCommandOutput;
-    if isfield (inputMask, 'SaveImageFileWithModel')
-        outputMask.SaveImageFileWithModel = 'on';
-    end
-catch err
-    warning("Output de-serializer mask creation failed with error: %s", err);
-end
+outputMask = Simulink.Mask.create(sprintf('%s/outputParser', subsystem_path));
+outputMask.IconUnits = 'pixels';
+outputMask.Display = maskCommandOutput;
+outputMask.SaveImageFileWithModel = 'on';
 
 % Set number of output ports
 % set_param('%s/outputParser', 'num')
@@ -157,18 +148,11 @@ set_param(sprintf("%s/UDP Send", subsystem_path), 'Host', zSettings.ip);
 set_param(sprintf("%s/UDP Send", subsystem_path), 'Port', zSettings.udpport);
 set_param(sprintf("%s/UDP Send", subsystem_path), 'AttributesFormatString', "%<Host>:%<Port>");
 set_param(sprintf("%s/UDP Send", subsystem_path), 'Priority', "0");
-
-% Add mask - in try-catch since it is non-critical
-try
-    runMask = Simulink.Mask.create(sprintf('%s/Run Command', subsystem_path));
-    runMask.IconUnits = 'pixels';
-    runMask.Display = maskCommandRun;
-    if isfield(runMask, 'SaveImageFileWithModel')
-        runMask.SaveImageFileWithModel = 'on';
-    end
-catch err
-    warning("Input serialized mask creation failed with error: %s", err);
-end
+% Add mask
+runMask = Simulink.Mask.create(sprintf('%s/Run Command', subsystem_path));
+runMask.IconUnits = 'pixels';
+runMask.Display = maskCommandRun;
+runMask.SaveImageFileWithModel = 'on';
 
 %% Add TCP input send block
 add_block('instrumentlib/TCP//IP Send', sprintf('%s/TCP Send', subsystem_path));
