@@ -33,6 +33,25 @@ CppScript = {};
 CppScript = vertcat(CppScript, ...
     sprintf('#include "%s.h"', save_file_name));     % Memory mapping
 
+%% For SIMULINK
+if strcmp(inputObj.Coder, "Simulink")
+
+    % Define dwork
+    CppScript = vertcat(CppScript, ...
+    sprintf("DW dwork;")); 
+
+    % Define RT_MODEL
+    CppScript = vertcat(CppScript, ...
+    sprintf("RT_MODEL RTM;")); 
+
+   
+    % Define model initialization variable
+    CppScript = vertcat(CppScript, ...
+    sprintf("bool MODEL_INITIALIZED = false;")); 
+end
+
+%%
+
 CppScript = vertcat(CppScript, ...
     sprintf("void callFunction() {"));
 
