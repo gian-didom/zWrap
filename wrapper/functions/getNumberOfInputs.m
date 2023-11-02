@@ -1,6 +1,8 @@
 function [numInputs,nameInputs, typeInputs, sizeInputs] = getNumberOfInputs(codeInfo)
 %GETNUMBEROFINPUTS Summary of this function goes here
 %   Detailed explanation goes here
+
+% TODO: Remake with Prototype.Arguments
 numInputs = 0;
 nameInputs = [];
 typeInputs = [];

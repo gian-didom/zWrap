@@ -85,15 +85,25 @@ add_block('simulink/User-Defined Functions/MATLAB Function', sprintf('%s/inputSe
 config = get_param(sprintf("%s/inputSerializer", subsystem_path), 'MATLABFunctionConfiguration');
 config.FunctionScript = fileread(sprintf('z%s/simulink/%s_inputSerializer.m', iss.fcnName, iss.fcnName));
 
+stateflowBlock = find(get_param(subsystem_path,"Object"), '-isa', 'Stateflow.EMChart', 'Path', sprintf('%s/inputSerializer', subsystem_path));
+% Set input types to the corresponding Bus for structures
+for j=1:numel(input_buses)
+    bus = input_buses{j};
+    inputIndex = bus.index;
+    stateflowBlock.Inputs(inputIndex).DataType = sprintf("Bus: %s", bus.busName);
+end
+
 % Add mask - add try/catch since it is non-critical
 try
-inputMask = Simulink.Mask.create(sprintf('%s/inputSerializer', subsystem_path));
-inputMask.IconUnits = 'pixels';
-inputMask.Display = maskCommandInput;
-if ismethod (inputMask, 'SaveImageFileWithModel')
-inputMask.SaveImageFileWithModel = 'on';
+    inputMask = Simulink.Mask.create(sprintf('%s/inputSerializer', subsystem_path));
+    inputMask.IconUnits = 'pixels';
+    inputMask.Display = maskCommandInput;
+    if isfield (inputMask, 'SaveImageFileWithModel')
+        inputMask.SaveImageFileWithModel = 'on';
+    end
+catch err
+    warning("Input serialized mask creation failed with error: %s", err);
 end
-except
 
 
 
@@ -118,19 +128,33 @@ for j=1:numel(output_buses)
     stateflowBlock.Outputs(outputIndex).DataType = sprintf("Bus: %s", bus.busName);
 end
 
-outputMask = Simulink.Mask.create(sprintf('%s/outputParser', subsystem_path));
-outputMask.IconUnits = 'pixels';
-outputMask.Display = maskCommandOutput;
-outputMask.SaveImageFileWithModel = 'on';
+% Output mask - in try-catch because non-critical
+try
+    outputMask = Simulink.Mask.create(sprintf('%s/outputParser', subsystem_path));
+    outputMask.IconUnits = 'pixels';
+    outputMask.Display = maskCommandOutput;
+    if isfield (inputMask, 'SaveImageFileWithModel')
+        outputMask.SaveImageFileWithModel = 'on';
+    end
+catch err
+    warning("Output de-serializer mask creation failed with error: %s", err);
+end
 
 % Set number of output ports
 % set_param('%s/outputParser', 'num')
 %% Add input ports
+
 for j=1:numel(iss.Children)
     add_block('simulink/Sources/In1', sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName));
     add_line(subsystem_path, sprintf('in_%s/1', iss.Children(j).MATLABName), sprintf('inputSerializer/%i', j));
 end
 
+% Set input types to the corresponding Bus for structures
+for j=1:numel(input_buses)
+    bus = input_buses{j};
+    inputIndex = bus.index;
+    set_param(sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName)), 'OutDataTypeStr', sprintf("Bus: %s", bus.busName));
+end
 %% Add output ports
 for j=1:numel(oss.Children)
     add_block('simulink/Sinks/Out1', sprintf('%s/out_%s', subsystem_path, oss.Children(j).MATLABName));
@@ -148,11 +172,18 @@ set_param(sprintf("%s/UDP Send", subsystem_path), 'Host', zSettings.ip);
 set_param(sprintf("%s/UDP Send", subsystem_path), 'Port', zSettings.udpport);
 set_param(sprintf("%s/UDP Send", subsystem_path), 'AttributesFormatString', "%<Host>:%<Port>");
 set_param(sprintf("%s/UDP Send", subsystem_path), 'Priority', "0");
-% Add mask
-runMask = Simulink.Mask.create(sprintf('%s/Run Command', subsystem_path));
-runMask.IconUnits = 'pixels';
-runMask.Display = maskCommandRun;
-runMask.SaveImageFileWithModel = 'on';
+
+% Add mask - in try-catch since it is non-critical
+try
+    runMask = Simulink.Mask.create(sprintf('%s/Run Command', subsystem_path));
+    runMask.IconUnits = 'pixels';
+    runMask.Display = maskCommandRun;
+    if isfield(runMask, 'SaveImageFileWithModel')
+        runMask.SaveImageFileWithModel = 'on';
+    end
+catch err
+    warning("Input serialized mask creation failed with error: %s", err);
+end
 
 %% Add TCP input send block
 add_block('instrumentlib/TCP//IP Send', sprintf('%s/TCP Send', subsystem_path));
@@ -277,6 +308,14 @@ zphoto.Position(3:4) = zphoto.Position(1:2) + [40 35]*3.5;
 
 %% Add initialization callback, to embed buses inside the model
 initfcn_string = '';
+for j=1:numel(input_buses)
+    bus = input_buses{j};
+    initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n\n", ...
+        initfcn_string, ...
+        bus.cellrep, ...
+        bus.cellname);
+end
+
 for j=1:numel(output_buses)
     bus = output_buses{j};
     initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n\n", ...

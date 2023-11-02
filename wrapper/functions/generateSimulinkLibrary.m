@@ -85,6 +85,14 @@ add_block('simulink/User-Defined Functions/MATLAB Function', sprintf('%s/inputSe
 config = get_param(sprintf("%s/inputSerializer", subsystem_path), 'MATLABFunctionConfiguration');
 config.FunctionScript = fileread(sprintf('z%s/simulink/%s_inputSerializer.m', iss.fcnName, iss.fcnName));
 
+stateflowBlock = find(get_param(subsystem_path,"Object"), '-isa', 'Stateflow.EMChart', 'Path', sprintf('%s/inputSerializer', subsystem_path));
+% Set input types to the corresponding Bus for structures
+for j=1:numel(input_buses)
+    bus = input_buses{j};
+    inputIndex = bus.index;
+    stateflowBlock.Inputs(inputIndex).DataType = sprintf("Bus: %s", bus.busName);
+end
+
 % Add mask - add try/catch since it is non-critical
 try
     inputMask = Simulink.Mask.create(sprintf('%s/inputSerializer', subsystem_path));
@@ -135,11 +143,23 @@ end
 % Set number of output ports
 % set_param('%s/outputParser', 'num')
 %% Add input ports
+
 for j=1:numel(iss.Children)
+
+    dims = size(iss.Children(j).getTemplate());
     add_block('simulink/Sources/In1', sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName));
     add_line(subsystem_path, sprintf('in_%s/1', iss.Children(j).MATLABName), sprintf('inputSerializer/%i', j));
+    set_param( sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName), ...
+        'PortDimensions', strcat("[", sprintf('%i ', dims), "]"));
 end
 
+% Set input types to the corresponding Bus for structures
+for j=1:numel(input_buses)
+    bus = input_buses{j};
+    inputIndex = bus.index;
+    set_param(sprintf('%s/in_%s', subsystem_path, iss.Children(inputIndex).MATLABName), ...
+        'OutDataTypeStr', sprintf("Bus: %s", bus.busName));
+end
 %% Add output ports
 for j=1:numel(oss.Children)
     add_block('simulink/Sinks/Out1', sprintf('%s/out_%s', subsystem_path, oss.Children(j).MATLABName));
@@ -293,6 +313,14 @@ zphoto.Position(3:4) = zphoto.Position(1:2) + [40 35]*3.5;
 
 %% Add initialization callback, to embed buses inside the model
 initfcn_string = '';
+for j=1:numel(input_buses)
+    bus = input_buses{j};
+    initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n\n", ...
+        initfcn_string, ...
+        bus.cellrep, ...
+        bus.cellname);
+end
+
 for j=1:numel(output_buses)
     bus = output_buses{j};
     initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n\n", ...
