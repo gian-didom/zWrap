@@ -27,7 +27,7 @@ function zSettings = parsezArgs(varargin)
 paramsNameValue = {'path', 'ip', 'udpport', 'tcpport', 'stack', 'heap', ...
                     'baud', 'customArmPath', 'customMakePath', ...
                     'customBootgenPath', 'customXilinxPath'};
-paramsDefaultValues = {'none', '192.168.1.10', '8', '7', '200000', '2000', '115200', '', '', '', '', '', ''};
+paramsDefaultValues = {'none', '192.168.1.10', '7', '8', '200000', '2000', '115200', '', '', '', '', '', ''};
 paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
 
 % Initialize structure

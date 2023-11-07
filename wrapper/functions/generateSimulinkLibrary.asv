@@ -118,11 +118,7 @@ config.FunctionScript = fileread(sprintf('z%s/simulink/%s_outputParser.m', iss.f
 stateflowBlock = find(get_param(subsystem_path,"Object"), '-isa', 'Stateflow.EMChart', 'Path', sprintf('%s/outputParser', subsystem_path));
 for j=1:numel(oss.Children)
     dims = size(oss.Children(j).getTemplate());
-    if (numel(dims) == 2 && (dims(1) == 1 || dims(2) == 1))
-        stateflowBlock.Outputs(j).Props.Array.Size = sprintf('%i ', prod(dims));
-    else
-        stateflowBlock.Outputs(j).Props.Array.Size = strcat("[", sprintf('%i ', dims), "]");
-    end
+    stateflowBlock.Outputs(j).Props.Array.Size = strcat("[", sprintf('%i ', dims), "]");
 end
 
 % Set output types to the corresponding Bus for structures
@@ -153,13 +149,8 @@ for j=1:numel(iss.Children)
     dims = size(iss.Children(j).getTemplate());
     add_block('simulink/Sources/In1', sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName));
     add_line(subsystem_path, sprintf('in_%s/1', iss.Children(j).MATLABName), sprintf('inputSerializer/%i', j));
-    if numel(dims) == 2 && (dims(1) == 1 || dims(2) == 1)
-        set_param( sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName), ...
-                'PortDimensions', sprintf('%i ', prod(dims)));
-    else
-        set_param( sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName), ...
-            'PortDimensions', strcat("[", sprintf('%i ', dims), "]"));
-    end
+    set_param( sprintf('%s/in_%s', subsystem_path, iss.Children(j).MATLABName), ...
+        'PortDimensions', strcat("[", sprintf('%i ', dims), "]"));
 end
 
 % Set input types to the corresponding Bus for structures
@@ -347,17 +338,16 @@ end
 assignscript = fileread(fullfile("support", "script_assignexistingbus.m"));
 for j=1:numel(input_buses)
     bus = input_buses{j};
-    initfcn_string = sprintf("%s\n%s\n", ...
-        initfcn_string, ...
-        strrep(assignscript, "{{BUSNAME}}", bus.cellname));
+    initfcn_string = sprintf("%s\n\n", ...
+        as);
 end
 for j=1:numel(output_buses)
     bus = output_buses{j};
-    initfcn_string = sprintf("%s\n%s\n", ...
+    initfcn_string = sprintf("%s\n\n%s\n\nSimulink.Bus.cellToObject(%s);\n", ...
         initfcn_string, ...
-        strrep(assignscript, "{{BUSNAME}}", bus.cellname));
+        bus.cellrep, ...
+        bus.cellname);
 end
-
 
 % Assign callback
 set_param(subsystem_path, 'InitFcn', initfcn_string);

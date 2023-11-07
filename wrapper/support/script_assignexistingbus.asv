@@ -1,0 +1,15 @@
+
+for j=1:numel(cellInfo_slBus5_alt)
+    thisBus = {{BUSNAME}};
+    % Check correspondence with existing buses
+    for ks = 1:numel(existingBusVarNames)
+        existingBus = existingBusVars.(existingBusVarNames{ks});
+        if bsxequalbus(thisBus, existingBus)
+            fprintf("Found equality between %s and %s. Replacing...\n", ...
+                , existingBusVarNames{ks})
+             {{BUSNAME}} = existingBus;
+            break;
+        end
+    end
+end
+
