@@ -27,6 +27,11 @@ CppScript = vertcat(CppScript, ...
 CppScript = vertcat(CppScript, ...
     sprintf("#define _ZMEMORY_MAP\n\n"));
 
+%% Simulink define
+if strcmp(inputObj.Coder,"Simulink")
+    CppScript = vertcat(CppScript, ...
+    sprintf("\n#define SIMULINK\n\n"));
+end
 
 
 %% Addresses

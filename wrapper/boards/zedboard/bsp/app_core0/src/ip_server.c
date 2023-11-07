@@ -45,6 +45,7 @@
 struct tcp_pcb* tcpobj;
 
 char RUN_COMMAND[] = "run\n";
+char SIM_RESET_COMMAND [] = "simreset\n";
 char STATUS_COMMAND[] = "status\n";
 
 
@@ -70,17 +71,18 @@ int transfer_output() {
 		current_pointer += bytesToSend;
 
 	} else {
-	err = tcp_write(tcpobj, OUTPUTSTRUCT_BASE_ADDR, OUTPUT_STRUCT_SIZE, 0);
-	current_pointer = OUTPUT_STRUCT_SIZE;
+	    err = tcp_write(tcpobj, OUTPUTSTRUCT_BASE_ADDR, OUTPUT_STRUCT_SIZE, 0);
+	    current_pointer = OUTPUT_STRUCT_SIZE;
 	};
 
-	// If we sent all the bytes, then
+	// If we sent all the bytes
 	if (current_pointer >= OUTPUT_STRUCT_SIZE) {
-	CORE1_STATUS_VAL = IDLE_STATUS_ARM1;
-	CORE0_STATUS_VAL = IDLE_STATUS_ARM0;
-	current_pointer = 0;
-	}
-	return (int) err;
+        // then reset the pointer and return true.
+	    current_pointer = 0;
+        return 1;
+	} // else 
+    return 0;
+    
 }
 
 int transfer_data() {
@@ -155,6 +157,22 @@ void manage_run() {
 	CORE0_STATUS_VAL = WAITING_FOR_INPUTS;
 }
 
+void manage_simulink_reset() {
+
+    #ifdef SIMULINK
+        if (CORE1_STATUS_VAL == IDLE_STATUS_ARM1) {
+            CORE1_STATUS_VAL = SIMULINK_RESET_REQ;  // This first,
+            CORE0_STATUS_VAL = SIMULINK_RESET_REQ;  // then this.
+        } else {
+            xil_printf("Couldn't reset because Core1 is busy");
+        }
+    return;
+    #endif
+    
+    // else
+    xil_printf("This is not a Simulink application.");
+}
+
 /** Receive data on a udp session */
 static void udp_manage_callback(void *arg, struct udp_pcb *tpcb,
 		struct pbuf *p, const ip_addr_t *addr, u16_t port)
@@ -172,7 +190,9 @@ static void udp_manage_callback(void *arg, struct udp_pcb *tpcb,
 
 		if (strcmp(RUN_COMMAND, (char*) p->payload) == 0) {
 			manage_run();
-		}
+		} else if (strcmp(SIM_RESET_COMMAND, (char*) p->payload) == 0) {
+            manage_simulink_reset();
+        }
 		// tcp_output(tcpobj);
 	} else
 		xil_printf("no space in tcp_sndbuf\n\r");

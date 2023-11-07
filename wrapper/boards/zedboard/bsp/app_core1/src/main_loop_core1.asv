@@ -87,6 +87,7 @@ int main()
                     callFunction();
                     // Set status to complete
                     CORE1_STATUS_VAL = COMPLETED_STATUS;
+                    // Status will be moved to IDLE by Core0 after sending.
                 }
 
                 break;
@@ -98,7 +99,6 @@ int main()
             
             case COMPLETED_STATUS:
                 // =========================================== Completed
-                // Status will be moved to IDLE by Core0 after sending.
 
                 break;
 
@@ -106,18 +106,15 @@ int main()
             case SIMULINK_RESET_REQ:
                 // ===================================== Reset requested
                 MODEL_INITIALIZED = false;
-                CORE1_STATUS_VAL = COMPLETED_RESET;
+                CORE1_STATUS_VAL = RESET_COMPLETED;
                 // Core0 will now reset the state to idle
                 break;
 
-            case COMPLETED_RESET:
+            case RESET_COMPLETED:
                 // ===================================== Reset completed
 
                 break;    
             #endif
-
-            default:
-                printf("Unhandled state for Core1\n");
              
         }
 

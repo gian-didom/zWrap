@@ -11,6 +11,7 @@
 #define ARM1_STARTADR_LOC 0xFFFFFFF0                                                // Memory region in which to write the base address of Core1
 #define ARM1_BASEADDR ((OUTPUTSTRUCT_BASE_ADDR+OUTPUT_STRUCT_SIZE+2047)/2048)*2048        // Start address of ARM1 memory region - top to 2048 as per specifications (CHECK)!
 
+
 // Expansion: the COMM_VAL is the value of a volatile unsigned long.
 // It is _volatile_ because its value can change with no action being taken by the code (in this case, Core1 could change its value)
 // Unsigned long means that the value is 4 bytes at maximum.
@@ -19,13 +20,16 @@
 enum ARM0_STATUS_ENUM {
     IDLE_STATUS_ARM0 = 0,
     WAITING_FOR_INPUTS = 1,
-    WAITING_FOR_OUTPUTS = 2
+    WAITING_FOR_OUTPUTS = 2,
+    WAITING_FOR_RESET = 3
 };
 
 enum ARM1_STATUS_ENUM {
     IDLE_STATUS_ARM1 = 0,
     RUNNING_STATUS = 1,
 	COMPLETED_STATUS = 2,
+    SIMULINK_RESET_REQ = 3,
+    COMPLETED_RESET = 4,
     ERROR_STATUS = -1
 };
 

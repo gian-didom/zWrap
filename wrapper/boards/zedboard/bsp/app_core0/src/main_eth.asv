@@ -212,14 +212,9 @@ int main_eth()
 
             case WAITING_FOR_OUTPUTS:
                 // ================================== Waiting for outputs
-                if (CORE1_STATUS_VAL == COMPLETED_STATUS) {
-                    // Transfer bytes
-			        while (!transfer_output());
-
-                    // If we exit the while loop, the transfer has finished.
-                    CORE0_STATUS_VAL = IDLE_STATUS_ARM0;
-                    CORE1_STATUS_VAL = IDLE_STATUS_ARM1;
-                }
+                if (CORE1_STATUS_VAL == COMPLETED_STATUS) 
+			        transfer_output();
+               
 
                 break;
 

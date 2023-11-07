@@ -2,7 +2,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
     %CODERINPUT Summary of this class goes here
     %   Detailed explanation goes here
 
-    %% 
+    %%
     properties (SetObservable)
         Name = ''
         argNames = {}
@@ -30,9 +30,9 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         passedBy = 'value'  %'value' or 'pointer'
     end
 
-    %% 
+    %%
     methods
-        %%
+        %% function obj = coderArgument(codeInfoObject)
         function obj = coderArgument(codeInfoObject)
             if nargin == 0
                 return
@@ -42,6 +42,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
             obj.originalObject = codeInfoObject;
         end
 
+        %% function obj = setName(obj, name)
         function obj = setName(obj, name)
             obj.Name = name;
             if isempty(obj.argNames) || isempty(obj.argNames{1})
@@ -50,20 +51,22 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
 
         end
 
+        %% name = getCppArgumentForCall(obj, baseName)
         function name = getCppArgumentForCall(obj, baseName)
-            
+
             switch obj.passedBy
                 case 'pointer'
-            name = strcat('&(', baseName, '->', obj.Name, ')');
+                    name = strcat('&(', baseName, '->', obj.Name, ')');
 
                 otherwise
-            name = strcat(baseName, '->', obj.Name);
+                    name = strcat(baseName, '->', obj.Name);
             end
-            
+
         end
 
+        %% function td = getCppDeclaration(obj)
         function td = getCppDeclaration(obj)
-            
+
             td = sprintf("%s %s;", obj.Type, obj.Name);
 
         end
@@ -161,7 +164,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
 
         function generateMATLABFunction(obj, accessName)
             % This is abstract and should be overridden.
-            
+
         end
 
 
@@ -172,11 +175,12 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
     %%
     methods(Sealed)
 
-        %%
+        %% function out = hasChildren(obj)
         function out = hasChildren(obj)
             out = (numel(obj.Children) > 0);
         end
 
+        %% function obj = setMATLABCastType(obj)
         function obj = setMATLABCastType(obj)
             switch obj.MATLABType
 
@@ -215,18 +219,16 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
     % end
 
     %%
-   
+
 
     methods(Static)
 
 
-        
+
 
         %% function outobj = processObject2(inobj, varargin)
         % This is the factory function.
         function outobj = processObject2(inobj, varargin)
-
-   
 
             if isa(inobj, 'RTW.DataInterface')
                 % This block is executed in case the passed object is of
@@ -245,7 +247,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                         else
                             error('No Identifier field in structure');
                         end
-                        
+
                         outobj = coderArgument.processObject2(impl.Type);
 
                         % Augment with name information
@@ -302,49 +304,49 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         end
 
         %% function outobj = processObject(inobj, varargin)
-        % Legacy 
+        % Legacy
         % function outobj = processObject(inobj, varargin)
-        % 
+        %
         %     isDirectInput = false;
         %     if isa(inobj, 'RTW.DataInterface')
         %         % Mark as dfault input and continue with impl
         %         isDirectInput = true;
         %         inobj = inobj.Implementation;
         %     end
-        % 
+        %
         %     switch class(inobj)
-        % 
+        %
         %         case 'RTW.TypedCollection'
         %             % This MATLAB input has been expanded in multiple elements
         %             outobj = arrayfun(@(x,j) coderArgument.processObject(x,mod(j,2)==1, mod(j,2)==0), inobj.Elements, 1:numel(inobj.Elements));
         %             return;
-        % 
+        %
         %         case 'RTW.Variable'
         %             % Array type case
         %             if any(strcmp(fields(inobj.Type), 'BaseType'))
         %                 outobj = coderMatrix(inobj, varargin{:});
         %                 return;
         %             end
-        % 
+        %
         %             % Struct case
         %             if isa(inobj.Type, 'coder.types.Struct')
         %                 outobj = coderStructure(inobj,varargin{:});
         %                 return;
         %             end
-        % 
+        %
         %             %
         %             if any(strcmp(fields(inobj.Type), 'WordLength'))
         %                 outobj = coderBaseType(inobj, varargin{:});
-        % 
+        %
         %             else
         %                 error('Not covered');
         %             end
-        % 
-        % 
+        %
+        %
         %         case {'RTW.AggregateElement', 'coder.types.AggregateElement'}
-        % 
+        %
         %             if any(strcmp(fields(inobj.Type), 'Elements'))
-        % 
+        %
         %                 % Check if is a data-size type of object
         %                 if (numel(inobj.Type.Elements) == 2 && strcmp(strrep(inobj.Type.Elements(1).Identifier, 'data', 'size'), inobj.Type.Elements(2).Identifier))
         %                     outobj = coderMatrixStructure(inobj, varargin{:});
@@ -353,23 +355,23 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         %                 end
         %                 return;
         %             end
-        % 
+        %
         %             if any(strcmp(fields(inobj.Type), 'BaseType'))
         %                 outobj = coderMatrix(inobj, varargin{:});
         %                 return;
         %             end
-        % 
+        %
         %             if any(strcmp(fields(inobj.Type), 'WordLength'))
         %                 outobj = coderBaseType(inobj, varargin{:});
         %                 return;
         %             end
-        % 
+        %
         %             % If we are here...
         %             error("Not covered.");
-        % 
+        %
         %         otherwise
         %             error("The handling of %s has not been implemented yet.", class(inobj));
-        % 
+        %
         %     end
         % end
 
