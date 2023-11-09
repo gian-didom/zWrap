@@ -24,11 +24,20 @@ function zSettings = parsezArgs(varargin)
 % * |pack|      - Use #pragma pack(1) to solve potential memory padding issues
 
 % 
-paramsNameValue = {'path', 'ip', 'udpport', 'tcpport', 'stack', 'heap', ...
+paramsNameValue = {'path', 'ip', 'udpport', ...
+                    'tcpport', 'stack', 'heap', ...
                     'baud', 'customArmPath', 'customMakePath', ...
-                    'customBootgenPath', 'customXilinxPath'};
-paramsDefaultValues = {'none', '192.168.1.10', '7', '8', '200000', '2000', '115200', '', '', '', '', '', ''};
-paramsTrigger = {'limstack', 'async', 'async2', 'rt', 'unprotect', 'debug', 'y', 'no_ocm', 'pack'};
+                    'customBootgenPath', 'customXilinxPath', 'extensions', ...
+                    'board'};
+paramsDefaultValues = {'none',      '192.168.1.10',         '7', ...
+                        '8',        '200000',               '2000', ...
+                        '115200',   '',                     '', ...
+                        '',         '',                     {}, ...
+                        'zedboard'};
+
+paramsTrigger = {'limstack', 'async', 'async2', ...
+                 'rt', 'unprotect', 'debug', ...
+                 'y', 'no_ocm', 'pack'};
 
 % Initialize structure
 for j=1:numel(paramsNameValue)
@@ -49,6 +58,13 @@ for j=1:numel(varargin)
         isParsing = true;
     elseif any(strcmp(varargin{j}(2:end), paramsTrigger))
         zSettings.(varargin{j}(2:end)) = true; 
+
+    elseif contains(varargin{j}, "-ext:")
+        % This is an extension
+        extSplit = split(varargin{j}, ":");
+        zSettings.extensions{end+1} = extSplit{2};
+        % TODO: Perform extension check
+
     else
         if isParsing
             isParsing = false;

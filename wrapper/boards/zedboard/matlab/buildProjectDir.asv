@@ -23,33 +23,9 @@ copyfile(fullfile(packDir, "*"), ...
 % 6b. Replace the built-in function with the custom BSP functions
 filesToReplace = dir(fullfile("boards", "zedboard", "replace"));
 for j=1:numel(filesToReplace)
-    filePath = fullfile("boards", "zedboard", "replace", filesToReplace(j).name);
-    if not(isfile(filePath))
-        continue;
-    end
-    [~, fileName, fileExt] = fileparts(filePath);
+    [filePath, fileName, fileExt] = fileparts(fullfile("boards", "zedboard", "replace", filesToReplace(j)));
     if any(strcmp(fileExt, {'.c', '.h', '.cpp', '.hpp'}))
-
-        fullfileName = strcat(fileName, fileExt);
-
-        % The file to pick
-        origFile = fullfile("boards", ...
-                            "zedboard", ...
-                            "replace", ...
-                            fullfileName);
-
-        % The location to parse the file into
-        targetFile = fullfile(targetFolderName, ...
-            "project", ...
-            sprintf("%s_multicore_system", fcnName), ...
-            fullfileName);
-
-        % If exists, 
-        if isfile(targetFile)
-            % Force replace
-            copyfile(origFile, targetFile, 'f');
-        end
-
+        if isfile(fullfile(targetFolderName, "project", sprintf("%s_multicore_system", fcnName)))
     end
 end
 

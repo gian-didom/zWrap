@@ -13,7 +13,6 @@ fprintbf("Checking dependencies...\n");
 
 %% Parse inputs
 zSettings = parsezArgs(varargin{:});
-addpath(genpath(fullfile("boards", zSettings.board)));
 
 %% STEP 0.1: Check if tools are available
 checkDependencies();
@@ -107,23 +106,9 @@ fprintbf('✓ Output size check successful.\n');
 % big INPUT_STRUCT that could be slightly bigger for alignment purposes.
 
 %% EXTENSION: IO EXTENSION
-extensionsBasePath = fullfile("boards", zSettings.board, "extensions");
-
-if isfolder(extensionsBasePath)
-
-    for j=1:numel(zSettings.extensions)
-        extName = zSettings.extensions{j};
-        % Get extension path
-        extPath = fullfile(extensionsBasePath, extName);
-
-        if not(isfolder(extPath))
-            warning("There is no extensions called %s.\n", extName);
-            continue;
-        end
-
-        % Run I/O extension
-        [iss, oss] = feval(sprintf("%sExtension", extName), "io", iss, oss);
-    end
+for j=1:numel(zSettings.extensions)
+    % Get extension path
+    if not(isfolder(fullfile("boards", zSettings.board, "ex")))
 end
 
 %% GENERATE PROJECT FOLDER
@@ -196,28 +181,9 @@ generateCppCallTemplate(iss, oss, fullfile(targetFolderName, 'generated', 'callF
 generateCppCallHeader(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.h'));
 printDone();
 
-%% EXTENSIONS: CODEGEN
-
-
-if isfolder(extensionsBasePath)
-
-    for j=1:numel(zSettings.extensions)
-        extName = zSettings.extensions{j};
-        % Get extension path
-        extPath = fullfile(extensionsBasePath, extName);
-
-        if not(isfolder(extPath))
-            warning("There is no extensions called %s.\n", extName);
-            continue;
-        end
-
-        % Run I/O extension
-        feval(sprintf("%sExtension", extName), "codegen", targetFolderName);
-    end
-end
 
 %% GENERATE BOARD BUILD
-boardName = zSettings.board;
+boardName = zSettings.boardName;
 pathsToRemove = split(genpath('boards'), ':');
 
 % rmpath(genpath('boards'));
@@ -255,7 +221,7 @@ fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
 
 %% RUN makefiles
 fprintf("Running makefiles...")
-buildVar = 'Release';
+buildVar = 'Debug';
 [makeFlag] = system(sprintf("cd %s %s %s", ...
                                 fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar), ...
                                 cmdsep, ...

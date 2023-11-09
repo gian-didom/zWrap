@@ -38,6 +38,10 @@ CppScript = vertcat(CppScript, ...
 CppScript = vertcat(CppScript, ...
     sprintf('#include "memory_structure.h"'));     % Memory mapping
 
+% Includes
+CppScript = vertcat(CppScript, ...
+    sprintf('#include <cstring>'));     % Memory mapping
+
 % Function call, along with names. This runs on Core1 so there's no need to
 % use extern and blablabla (even if it would be cool to precompile... )
 % TODO: Consider separate compilation using extern.

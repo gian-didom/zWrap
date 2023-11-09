@@ -358,6 +358,9 @@ for j=1:numel(output_buses)
         strrep(assignscript, "{{BUSNAME}}", bus.cellname));
 end
 
+% Add bsxfun
+fcnContent = fileread(fullfile("functions", "bsxequalbus.m"));
+initfcn_string = sprintf("%s\n%s\n", initfcn_string, fcnContent);
 
 % Assign callback
 set_param(subsystem_path, 'InitFcn', initfcn_string);

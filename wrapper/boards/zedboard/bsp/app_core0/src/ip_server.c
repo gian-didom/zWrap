@@ -161,8 +161,10 @@ void manage_simulink_reset() {
 
     #ifdef SIMULINK
         if (CORE1_STATUS_VAL == IDLE_STATUS_ARM1) {
-            CORE1_STATUS_VAL = SIMULINK_RESET_REQ;  // This first,
             CORE0_STATUS_VAL = SIMULINK_RESET_REQ;  // then this.
+            CORE1_STATUS_VAL = SIMULINK_RESET_REQ;  // This first,
+            xil_printf("Resetting...");
+
         } else {
             xil_printf("Couldn't reset because Core1 is busy");
         }
