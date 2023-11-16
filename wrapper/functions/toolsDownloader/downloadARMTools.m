@@ -2,6 +2,12 @@ function [outputArg1,outputArg2] = downloadARMTools()
 %DOWNLOADTOOLS Summary of this function goes here
 %   Detailed explanation goes here
 
+
+if not(isfolder('tools')); mkdir('tools'); end
+if not(isfolder(fullfile('tools', 'temp'))); mkdir(fullfile('tools', 'temp')); end
+if not(isfolder(fullfile('tools', 'arm-none-eabi'))); mkdir(fullfile('tools', 'temp', 'arm-none-eabi')); end
+
+
 switch computer
     case 'MACA64'
         % Download

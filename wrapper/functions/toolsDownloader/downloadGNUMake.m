@@ -2,6 +2,14 @@ function [outputArg1,outputArg2] = downloadGNUMake()
 %DOWNLOADTOOLS Summary of this function goes here
 %   Detailed explanation goes here
 
+
+
+
+if not(isfolder('tools')); mkdir('tools'); end
+if not(isfolder(fullfile('tools', 'temp'))); mkdir(fullfile('tools', 'temp')); end
+if not(isfolder(fullfile('tools', 'make'))); mkdir(fullfile('tools', 'temp', 'make')); end
+
+
 switch computer
     case 'MACA64'
         % Download

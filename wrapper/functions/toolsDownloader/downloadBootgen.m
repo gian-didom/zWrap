@@ -4,6 +4,11 @@ global zEnv
 %   Detailed explanation goes here
 
 
+if not(isfolder('tools')); mkdir('tools'); end
+if not(isfolder(fullfile('tools', 'temp'))); mkdir(fullfile('tools', 'temp')); end
+if not(isfolder(fullfile('tools', 'bootgen'))); mkdir(fullfile('tools', 'temp', 'bootgen')); end
+
+
 switch computer
     case 'MACA64'
         % Download
