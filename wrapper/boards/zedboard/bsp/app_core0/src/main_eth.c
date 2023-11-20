@@ -214,7 +214,7 @@ int main_eth()
                 // ================================== Waiting for outputs
                 if (CORE1_STATUS_VAL == COMPLETED_STATUS) {
                     // Transfer bytes
-			        if (!transfer_output());
+			        if (transfer_output());
                     {
                     // If we exit the while loop, the transfer has finished.
                         CORE0_STATUS_VAL = IDLE_STATUS_ARM0;
