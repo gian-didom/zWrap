@@ -28,28 +28,31 @@ coder_project_path = projectDir.path;
 fprintbf('Loading coded project information...');
 buildInfoStruct = load(fullfile(coder_project_path, 'buildInfo.mat'));
 codeInfoStruct = load(fullfile(coder_project_path, 'codeInfo.mat'));
-compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
+% compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
 
 buildInfo = buildInfoStruct.buildInfo;
 codeInfo = codeInfoStruct.codeInfo;
 printDone();
 
 % Create packNGo including all headers
-fprintbf('Packing code including all headers... ');
-zipName = fullfile(coder_project_path, ...
-    strcat(buildInfo.ComponentName, ".zip"));
-packDir = fullfile(coder_project_path, 'pack');
+if not(zSettings.pack)
+    fprintbf('Packing code including all headers... ');
+    zipName = fullfile(coder_project_path, ...
+        strcat(buildInfo.ComponentName, ".zip"));
+    packDir = fullfile(coder_project_path, 'pack');
 
-if (exist(packDir, 'dir'))
-    rmdir(packDir, 's');
+    if (exist(packDir, 'dir'))
+        rmdir(packDir, 's');
+    end
+    modifiedpackNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
+        'minimalHeaders', false, ...
+        'fileName', zipName);
+    unzip(zipName, packDir);
+    fprintbf('All code succesfully packed in %s', packDir);
+    printDone();
+else
+    packDir = coder_project_path;
 end
-modifiedpackNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
-    'minimalHeaders', false, ...
-    'fileName', zipName);
-unzip(zipName, packDir);
-fprintbf('All code succesfully packed in %s', packDir);
-printDone();
-
 
 % Comment out main functions
 if isfile(fullfile(packDir, 'ert_main.c'))
@@ -257,10 +260,10 @@ fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
 fprintf("Running makefiles...")
 buildVar = 'Release';
 [makeFlag] = system(sprintf("cd %s %s %s", ...
-                                fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar), ...
-                                cmdsep, ...
-                                zEnv.makeBin), ...
-                        "-echo");
+    fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar), ...
+    cmdsep, ...
+    zEnv.makeBin), ...
+    "-echo");
 printDone();
 %% RUN TESTS
 

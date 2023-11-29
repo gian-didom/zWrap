@@ -289,6 +289,10 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                             outobj = coderFixedMatrix(inobj);
                         end
 
+                    case 'coder.types.Pointer'
+                        % Pointer: try to cast
+                        outobj = coderArgument.processObject2(inobj.BaseType);
+
                     otherwise
                         % This is a lower-level or an error
                         if isprop(inobj, 'WordLength')
