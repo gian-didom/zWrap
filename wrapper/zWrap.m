@@ -250,11 +250,15 @@ buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
 % fprintbf('BOOT.bin image succesfully generated at %s\n', bootImagePath);
 
 %% GENERATE INTERFACES
+if (zSettings.nosimulink)
+    fprintbf("Skipping Simulink generation...\n");
+else
 fprintbf('Generating Simulink library...')
 SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', iss.fcnName));
 generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
 printDone();
 fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
+end
 
 %% RUN makefiles
 fprintf("Running makefiles...")

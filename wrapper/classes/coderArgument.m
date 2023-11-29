@@ -291,7 +291,18 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
 
                     case 'coder.types.Pointer'
                         % Pointer: try to cast
-                        outobj = coderArgument.processObject2(inobj.BaseType);
+                        warning("Warning: pointer handling is experimental. Currently, the function only returns the pointer." + ...
+                            "This allows to measure memory and execution time but not to retrieve the results.")
+                        outobj_temp = coderArgument.processObject2(inobj.BaseType);
+
+                        codeInfoObj.Name = 'uint32';
+                        codeInfoObj.WordLength = 32;
+                        codeInfoObj.Identifier = 'uint32';
+                        outobj = coderPrimitive(codeInfoObj);
+                        outobj.Role = 'output';
+                        outobj.Name = outobj_temp.Name;
+                        outobj.MATLABName = outobj_temp.MATLABName;
+
 
                     otherwise
                         % This is a lower-level or an error
