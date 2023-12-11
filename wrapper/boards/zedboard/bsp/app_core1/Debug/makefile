@@ -59,7 +59,8 @@ $(FUNCTION_NAME)_core1.elf: $(OBJS) ../src/lscript.ld $(USER_OBJS)
 
 $(FUNCTION_NAME)_core1.elf.size: $(FUNCTION_NAME)_core1.elf
 	@echo 'Invoking: ARM v7 Print Size'
-	arm-none-eabi-size $(FUNCTION_NAME)_core1.elf  |tee "$(FUNCTION_NAME)_core1.elf.size"
+	$(ARM_SIZE) $(FUNCTION_NAME)_core1.elf  > "$(FUNCTION_NAME)_core1.elf.size"
+	cat "$(FUNCTION_NAME)_core1.elf.size" || type "$(FUNCTION_NAME)_core1.elf.size"
 	@echo 'Finished building: $@'
 	@echo ' '
 

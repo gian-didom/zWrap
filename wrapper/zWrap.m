@@ -27,7 +27,7 @@ coder_project_path = projectDir.path;
 
 fprintbf('Loading coded project information...');
 buildInfoStruct = load(fullfile(coder_project_path, 'buildInfo.mat'));
-codeInfoStruct = load(fullfile(coder_project_path, 'codeInfo.mat'));
+codeInfoStruct = load(fullfile(coder_project_path, 'codeInfo.mat'), 'codeInfo');
 compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
 
 buildInfo = buildInfoStruct.buildInfo;
@@ -37,7 +37,7 @@ printDone();
 % Create packNGo including all headers
 fprintbf('Packing code including all headers... ');
 zipName = fullfile(coder_project_path, ...
-    strcat(buildInfo.ComponentName, ".zip"));
+    strcat(codeInfo.Name, ".zip"));
 packDir = fullfile(coder_project_path, 'pack');
 
 if (exist(packDir, 'dir'))

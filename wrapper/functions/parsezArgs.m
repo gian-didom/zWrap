@@ -74,8 +74,8 @@ for j=1:numel(varargin)
     end
 end
 
-assert(isfield(zSettings, 'path'), "Path not provided. Please specify a path with the -path flag.");
-assert(exist(zSettings.path, 'dir'), "The specified path <strong>%s</strong> does not exist.", zSettings.path)
+assert(isfield(zSettings, 'path') > 0, "Path not provided. Please specify a path with the -path flag.");
+assert(exist(zSettings.path, 'dir') > 0, "The specified path <strong>%s</strong> does not exist.", zSettings.path)
 
 % Fix stack size
 if strcmp(zSettings.stack(1:2), "0x")
