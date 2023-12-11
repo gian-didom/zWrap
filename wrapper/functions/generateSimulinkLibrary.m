@@ -321,6 +321,9 @@ zphoto.Position(3:4) = zphoto.Position(1:2) + [40 35]*3.5;
 
 
 %% Add initialization callback, to embed buses inside the model
+EMBEDDED_BUSES = false;
+
+if EMBEDDED_BUSES
 initfcn_string = '';
 
 % Step 1: load existing bus objects and store in structure
@@ -364,7 +367,7 @@ initfcn_string = sprintf("%s\n%s\n", initfcn_string, fcnContent);
 
 % Assign callback
 set_param(subsystem_path, 'InitFcn', initfcn_string);
-
+end
 
 
 %% Save library
