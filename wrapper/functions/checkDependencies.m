@@ -8,7 +8,9 @@ if isempty(zEnv.armPath) || zSettings.downloadarm
     answer = input("",'s');
     switch answer
         case {'Y', 'y', ''}
-            downloadARMTools(); checkDependencies(); return;
+            result = downloadARMTools();
+            assert(result, "ARM tools are needed to run zWrap.");
+            checkARMTools();
         otherwise
             error("ARM tools are needed to run zWrap.");
 
@@ -24,7 +26,15 @@ if isempty(zEnv.makePath) || zSettings.downloadmake
     answer = input("", 's');
     switch answer
         case {'Y', 'y', ''}
-            downloadGNUMake(); checkDependencies(); return;
+            result = downloadGNUMake(); checkGNUMake();
+            if (result) 
+                checkGNUMake(); 
+            else
+                warning("GNU make is needed to compile zWrap." + ...
+                "You can generate the makefiles and the Simulink block, " + ...
+                "but you cannot generate the .elf and the BOOT.bin image");
+            end
+
         otherwise
             warning("GNU make is needed to compile zWrap." + ...
                 "You can generate the makefiles and the Simulink block, " + ...
@@ -39,7 +49,14 @@ if isempty(zEnv.bootgenPath) || zSettings.downloadbootgen
     answer = input("", 's');
     switch answer
         case {'Y', 'y', ''}
-            downloadBootgen(); checkDependencies(); return;
+            result = downloadBootgen(); 
+            if (result) 
+                checkBootgen();
+            else
+                warning("bootgen is needed to generate the SD image." + ...
+                "You can generate the makefiles and the Simulink block, " + ...
+                "but you cannot generate the BOOT.bin image to be uploaded.");
+            end
         otherwise
             warning("bootgen is needed to generate the SD image." + ...
                 "You can generate the makefiles and the Simulink block, " + ...

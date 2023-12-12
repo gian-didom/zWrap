@@ -1,7 +1,8 @@
-function [outputArg1,outputArg2] = downloadARMTools()
+function result = downloadARMTools()
 %DOWNLOADTOOLS Summary of this function goes here
 %   Detailed explanation goes here
 
+result = false;
 
 if not(isfolder('tools')); mkdir('tools'); end
 if not(isfolder(fullfile('tools', 'temp'))); mkdir(fullfile('tools', 'temp')); end
@@ -27,6 +28,9 @@ switch computer
         delete(fullfile('tools', 'temp', 'armCompilerLatest.tar.bz2'));
         fprintbf("ARM GNU Compiler and tools succesfully installed in %s", fullfile('tools', 'arm-none-eabi'));
 
+        result = true;
+        return;
+
     case 'PCWIN64'
         % Download
 
@@ -50,6 +54,8 @@ switch computer
         % Clean
         delete(fullfile('tools', 'temp', 'armCompilerLatest.zip'));
         fprintbf("ARM GNU Compiler and tools succesfully installed in %s", fullfile('tools', 'arm-none-eabi'));
+        result = true;
+        return;
 
     case 'GLNXA64'
 

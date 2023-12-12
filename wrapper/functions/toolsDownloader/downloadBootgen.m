@@ -1,8 +1,9 @@
-function [outputArg1,outputArg2] = downloadBootgen()
+function result = downloadBootgen()
 global zEnv
 %DOWNLOADTOOLS Summary of this function goes here
 %   Detailed explanation goes here
 
+result = false;
 
 if not(isfolder('tools')); mkdir('tools'); end
 if not(isfolder(fullfile('tools', 'temp'))); mkdir(fullfile('tools', 'temp')); end
@@ -121,6 +122,8 @@ switch computer
                             % Clean
         delete(fullfile('tools', 'temp', 'bootgen-master.zip'));
         fprintbf("Bootgen has been succesfully (and incredibly!!) installed in %s\n", fullfile('tools', 'bootgen'));
+        result = true;
+        return;
 
     case 'PCWIN64'
 
@@ -139,6 +142,7 @@ switch computer
 
             % Extract OpenSSL in folder
             mkdir(fullfile("tools", "bootgen", "openssl"));
+            input(fprintbf("You are now going to install OpenSSL. Note that it is required to grant authorization permissions. Press ENTER to proceed\n."))
             [extStatus, ~] =  system(sprintf('"%s" /VERYSILENT /DIR="%s"', ...
                     fullfile("tools", "temp", "openssl-win64-3_1_3.exe"), ...
                     fullfile("tools", "bootgen", "openssl")), '-echo');
@@ -217,7 +221,9 @@ switch computer
         
                             % Clean
         delete(fullfile('tools', 'temp', 'bootgen-master.zip'));
-        fprintBf("Bootgen has been succesfully (and incredibly!!) installed in %s\n", fullfile('tools', 'bootgen'));
+        fprintbf("Bootgen has been succesfully (and incredibly!!) installed in %s\n", fullfile('tools', 'bootgen'));
+        result = true;
+        return;
 
     case 'GLNXA64'
 
