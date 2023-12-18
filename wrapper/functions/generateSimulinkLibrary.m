@@ -368,10 +368,6 @@ initfcn_string = sprintf("%s\n%s\n", initfcn_string, fcnContent);
 % Assign callback
 set_param(subsystem_path, 'InitFcn', initfcn_string);
 end
-<<<<<<< HEAD
-=======
-
->>>>>>> output-pointer
 
 %% Save library
 save_system(modelname, savepath);
