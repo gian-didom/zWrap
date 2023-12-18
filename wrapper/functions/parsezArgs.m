@@ -65,6 +65,13 @@ for j=1:numel(varargin)
         zSettings.extensions{end+1} = extSplit{2};
         % TODO: Perform extension check
 
+    elseif contains(varargin{j}, "-cf:")
+        % This is an user-given compile flag
+        flagsFull = split(varargin{j}, ":");
+        flags = split(flagsFull{2},";");
+        zSettings.userCompileFlags = cellfun(@(x) strcat('-', x), flags, 'UniformOutput', false);
+        % TODO: check
+
     else
         if isParsing
             isParsing = false;
