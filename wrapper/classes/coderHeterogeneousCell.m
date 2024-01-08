@@ -11,6 +11,9 @@ classdef (HandleCompatible) coderHeterogeneousCell < coderNestedObject
             obj.MATLABType = 'cell';
             obj.isCell = true;
             obj.setMATLABCastType();
+            warning("Simulink does not support cell array as signals. " + ...
+                "If you want to avoid errors in the generation of the Simulink block, " + ...
+                "re-run zWrap with the -simcelltostruct option.")
         end
 
         function [fcn, checkFcn] = getMappingFunction(obj)

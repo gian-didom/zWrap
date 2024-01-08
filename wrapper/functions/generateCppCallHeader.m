@@ -40,7 +40,7 @@ CppScript = vertcat(CppScript, ...
 
 % Includes
 CppScript = vertcat(CppScript, ...
-    sprintf('#include <cstring>'));     % Memory mapping
+    sprintf('#ifdef _cplusplus\n#include <cstring>\n#endif'));     % Memory mapping
 
 % Function call, along with names. This runs on Core1 so there's no need to
 % use extern and blablabla (even if it would be cool to precompile... )
