@@ -1,0 +1,292 @@
+classdef zWrapProject < handle
+    %ZWRAPPROJECT Summary of this class goes here
+    %   Detailed explanation goes here
+
+    properties
+        settings (1,1)  zWrapSettings;
+        packDir                                 = "";
+        inputs          fullInterfaceStructure  = fullInterfaceStructure.empty();
+        outputs         fullInterfaceStructure  = fullInterfaceStructure.empty();
+
+
+    end
+
+    properties (Access = private)
+        buildInfoStruct;
+        codeInfoStruct;
+        compileInfoStruct;
+        buildInfo;
+        codeInfo;
+
+        targetFolder;
+        extensionsBasePath;
+    end
+
+    methods
+
+        % =================================================================
+        % =================================================================
+        % zWrapProject(args)
+
+        function obj = zWrapProject(args)
+            %ZWRAPPROJECT Construct an instance of this class
+            %   Detailed explanation goes here
+            if obj.inputstring(args)
+                obj.settings = zWrapSettings(args);
+            elseif obj.inputstruct(args)
+
+                obj.settings = zWrapSettings();
+                for f=fields(args)
+                    obj.settings.(f) = args.(f);
+                end
+            end
+        end
+
+
+        % =================================================================
+        % =================================================================
+        % load(obj) - Loads the buildInfo, codeInfo and compileInfo
+        % objects found in the set project path.
+
+        function obj = load(obj)
+            % load(obj) - Loads the buildInfo, codeInfo and compileInfo
+            % objects found in the set project path.
+
+            fprintbf('Loading coded project information...');
+
+            obj.buildInfoStruct = load(fullfile(coder_project_path, 'buildInfo.mat'));
+            obj.codeInfoStruct = load(fullfile(coder_project_path, 'codeInfo.mat'), 'codeInfo');
+            obj.compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
+
+
+            obj.buildInfo = obj.buildInfoStruct.buildInfo;
+            obj.codeInfo = obj.codeInfoStruct.codeInfo;
+            
+            obj.printDone();
+
+        end
+
+        % =================================================================
+        % =================================================================
+        % pack(obj) - Create packNGo including all headers
+
+        function packDir = pack(obj)
+            % pack - Create packNGo including all headers
+            if not(obj.settings.pack)
+                fprintbf('Packing code including all headers... ');
+                zipName = fullfile(coder_project_path, ...
+                    strcat(obj.buildInfo.ComponentName, ".zip"));
+                packDir = fullfile(coder_project_path, 'pack');
+
+                if (exist(obj.packDir, 'dir'))
+                    rmdir(obj.packDir, 's');
+                end
+                modifiedpackNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
+                    'minimalHeaders', false, ...
+                    'fileName', zipName);
+                unzip(zipName, obj.packDir);
+                fprintbf('All code succesfully packed in %s', obj.packDir);
+                printDone();
+            else
+                packDir = coder_project_path;
+            end
+
+            obj.packDir = packDir;
+        end
+
+        % =================================================================
+        % =================================================================
+        % commentMains(obj) - Comment out main functions
+
+        function commentMains(obj)
+            % commentMains(obj) - Comment out main functions
+            if isfile(fullfile(obj.packDir, 'ert_main.c'))
+                movefile(fullfile(obj.packDir, 'ert_main.c'), fullfile(obj.packDir, 'ert_main.cbak'));
+            end
+
+            if isfile(fullfile(obj.packDir, 'ert_main.h'))
+                movefile(fullfile(obj.packDir, 'ert_main.h'), fullfile(obj.packDir, 'ert_main.hbak'));
+            end
+        end
+
+        % =================================================================
+        % =================================================================
+        % processInput(obj) - process inputs
+
+        function processInput(obj)
+            obj.inputs = fullInterfaceStructure(obj.codeInfo, 'input');
+            obj.inputs.getTotalSize();
+            obj.inputs.getTotalSizePadded();
+            obj.inputs.printTree();
+            fprintf('\n\n\n');
+        end
+
+
+        % =================================================================
+        % =================================================================
+        % processOutput(obj) - process outputs
+
+        function processOutput(obj)
+            obj.outputs = fullInterfaceStructure(obj.codeInfo, 'output');
+            obj.outputs.getTotalSize();
+            obj.outputs.getTotalSizePadded();
+            obj.outputs.printTree();
+            fprintf('\n\n\n');
+        end
+
+        % =================================================================
+        % =================================================================
+        % executeIOExtensions(obj) - Run the I/O extensions using the
+        % inputs and outputs object properties
+
+        function executeIOExtensions(obj)
+
+            if isfolder(obj.extensionsBasePath)
+            
+                for j=1:numel(obj.settings.extensions)
+                    extName = obj.settings.extensions{j};
+                    % Get extension path
+                    extPath = fullfile(obj.extensionsBasePath, extName);
+            
+                    if not(isfolder(extPath))
+                        warning("There is no extensions called %s.\n", extName);
+                        continue;
+                    end
+            
+                    % Run I/O extension
+                    [obj.inputs, obj.outputs] = feval(sprintf("%sExtension", extName), "io", obj.inputs, obj.outputs);
+                end
+            end
+        end
+
+        % =================================================================
+        % =================================================================
+        % executeCodegenExtensions(obj) - Runs the codegen extensions
+
+        function executeCodegenExtensions(obj)
+
+            if isfolder(obj.extensionsBasePath)
+
+                for j=1:numel(zSettings.extensions)
+                    extName = zSettings.extensions{j};
+                    % Get extension path
+                    extPath = fullfile(obj.extensionsBasePath, extName);
+            
+                    if not(isfolder(extPath))
+                        warning("There is no extensions called %s.\n", extName);
+                        continue;
+                    end
+            
+                    % Run I/O extension
+                    feval(sprintf("%sExtension", extName), "codegen", targetFolderName);
+                end
+            end
+
+        end
+
+        % =================================================================
+        % =================================================================
+        %
+        function generateProjectFolder(obj) 
+            fprintbf('Generating project folder...\n');
+            targetFolderName = fullfile('out', sprintf("z%s", obj.inputs.fcnName));
+            
+            
+            % 1. Create project folder
+            if exist(targetFolderName, 'dir')
+                if obj.settings.y
+                    usrInput = 'y';
+                else
+                    usrInput = input(sprintf("<strong>Folder %s already exists, overwrite?</strong> [Y/n/k] [k]\n", ...
+                        targetFolderName), "s");
+                end
+            
+            
+                switch usrInput
+            
+                    case {'Y', 'y'}
+                        warning('off', 'MATLAB:rmpath:DirNotFound');
+                        rmpath(genpath(targetFolderName))
+                        rmdir(targetFolderName, 's')
+                        warning('on', 'MATLAB:rmpath:DirNotFound');
+            
+                    case {'K', 'k', ''}
+                        new_targetFolderName = targetFolderName;
+                        j=1;
+                        while exist(new_targetFolderName, "dir")
+                            new_targetFolderName = sprintf("%s%i", targetFolderName, j);
+                            j = j+1;
+                        end
+                        targetFolderName = new_targetFolderName;
+            
+                    otherwise
+                        fprintf("Aborting.");
+                        return
+                end
+
+                
+            end
+            
+            mkdir(targetFolderName);
+            mkdir(fullfile(targetFolderName, "generated"));
+            mkdir(fullfile(targetFolderName, "simulink"));
+            mkdir(fullfile(targetFolderName, "project"));
+            
+            addpath(genpath(targetFolderName));
+            fprintbf("Project folder generated at %s\n", targetFolderName);
+            
+            obj.targetFolder = targetFolderName;
+            
+        end
+        
+        % =================================================================
+        % =================================================================
+        
+        function generateInputStreamParser(obj)
+            fprintbf('Generating input stream encoding and test function...');
+            obj.inputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'));
+            obj.inputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'), true);
+            printDone();
+        end
+
+        % =================================================================
+        % =================================================================
+        
+        function generateOutputStreamParser(obj)
+            fprintbf('Generating output stream decoding and test function...');
+            obj.outputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'));
+            obj.outputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'), true);
+            printDone();
+        end
+        
+        % =================================================================
+        % =================================================================
+        
+        function generateMemoryMap(obj)
+            fprintbf('Generating memory structure mapping header...');
+            generateCppMemoryMapping(obj.inputs, obj.outputs, fullfile(obj.targetFolder, 'generated', 'memorymap.h'));
+            printDone();
+        end
+
+        % =================================================================
+        % =================================================================
+        
+        function generateCEntryPoint(obj)
+            fprintbf('Generating C++ entry point header and function...');
+            generateCppCallTemplate(obj.inputs, obj.outputs, fullfile(obj.targetFolder, 'generated', 'callFunction.c'));
+            generateCppCallHeader(obj.inputs, obj.outputs, fullfile(obj.targetFolder, 'generated', 'callFunction.h'));
+            printDone();
+        end
+    end
+
+    methods (Static = true)
+        % =================================================================
+        % =================================================================
+
+        function printDone()
+            fprintbf('\t✓ Done.\n');
+        end
+    end
+
+end
+

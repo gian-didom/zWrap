@@ -221,6 +221,7 @@ if isfolder(extensionsBasePath)
     end
 end
 
+%% ================================= OOP: BOOKMARK ==========================
 %% GENERATE BOARD BUILD
 boardName = zSettings.board;
 pathsToRemove = split(genpath('boards'), ':');
