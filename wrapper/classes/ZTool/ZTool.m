@@ -74,7 +74,7 @@ classdef ZTool < handle
         % Install interface - must be implemented for all subclasses. 
         % This selector should NOT be overridden - instead, override the
         % OS implementations.
-        function selectInstall(obj)
+        function install(obj)
             % Check platform
             switch computer
                 
@@ -147,18 +147,6 @@ classdef ZTool < handle
                 case 'MACA64';  execName = "null";
                 case 'GLNXA64'; execName = "null";
                 case 'PCWIN64'; execName = "null.exe";
-                otherwise;      error("Architecture not supported for execution.")
-            end
-        end
-        
-        % ========================================================================
-        % Install interface - must be implemented for all subclasses
-        function install()
-            % Check platform
-            switch computer
-                case 'MACA64';  installMac();
-                case 'GLNXA64'; installLinux();
-                case 'PCWIN64'; installWin();
                 otherwise;      error("Architecture not supported for execution.")
             end
         end
