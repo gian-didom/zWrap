@@ -12,6 +12,8 @@ classdef ZTool < handle
         supportsLinux = false;
         supportsMac = false;
 
+        dependencies = {};
+
         path = "";
         execpath = "";
     end
@@ -35,6 +37,13 @@ classdef ZTool < handle
         function installed = check(obj, ask)
             if nargin == 1
                 ask = true;
+            end
+
+            for dep=obj.dependencies
+                % TODO: Check if an object exists with the name.
+                % Maybe should list availableTools in a structure
+                % or load all the object in the project availableTools folder.
+                fprintf("Checking for %s\n", dep);
             end
 
             installed = obj.checkInstall();
