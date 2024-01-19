@@ -31,7 +31,7 @@ src/%.o: ../src/%.c
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM v7 gcc compiler'
-	$(ARM_GPP) -DIO_BASE_ADDR=($(IO_BASE_ADDR)) -DUSE_AMP=1 -Wall -O0 -g3 -I"../../$(FUNCTION_NAME)_multicore_system/include_common" -c -fmessage-length=0 -MT"$@" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bspinclude/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(ARM_GPP) -DIO_BASE_ADDR=$(IO_BASE_ADDR) -DUSE_AMP=1 -Wall -O0 -g3 -I"../../$(FUNCTION_NAME)_multicore_system/include_common" -c -fmessage-length=0 -MT"$@" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bspinclude/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

@@ -275,7 +275,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
 
                 switch class(inobj)
 
-                    case {'coder.types.Struct', 'coder.types.Class'}
+                    case {'coder.types.Struct', 'coder.types.Class', 'coder.types.ContainerClass'}
                         % Check wether it is a structure or a cell
                         objTargetClass = coderNestedObject.disambiguate(inobj);
                         outobj = objTargetClass(inobj);

@@ -125,5 +125,10 @@ classdef (HandleCompatible) coderPrimitive < coderArgument
 
 
         end
+
+        %% function castType = getCastType(obj)
+        function castType = getCastType(obj)
+        castType = obj.MATLABCastType;
+        end
     end
 end

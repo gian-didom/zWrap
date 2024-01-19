@@ -7,12 +7,15 @@ typeOutputs = [];
 sizeOutputs = [];
 
 for j=1:numel(codeInfo.Outports)
+    obj = codeInfo.Outports(j);
     impl = codeInfo.Outports(j).Implementation;
 
     if isprop(impl, 'Identifier')
-        idFieldName = 'Identifier';
+        fieldName = impl.Identifier;
     elseif isprop(impl, 'ElementIdentifier')
-        idFieldName = 'ElementIdentifier';
+        fieldName = impl.ElementIdentifier;
+    elseif isprop(obj, 'GraphicalName')
+        fieldName = obj.GraphicalName';
     else
         error('No Identifier field in structure');
     end
@@ -20,7 +23,7 @@ for j=1:numel(codeInfo.Outports)
     % Check if single or multi
     if ~any(strcmp(fields(impl),'Elements'))
         numOutputs = numOutputs + 1;
-        nameOutputs = [nameOutputs; string(impl.(idFieldName))];
+        nameOutputs = [nameOutputs; string(fieldName)];
         if any(strcmp(fields(impl.Type),'BaseType'))
             typeOutputs = [typeOutputs; string(impl.Type.BaseType.Identifier)];
             sizeOutputs = [sizeOutputs; prod(impl.Type.Dimensions)];

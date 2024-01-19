@@ -329,5 +329,10 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
 
 
         end
+
+        %% function castType = getCastType(obj)
+         function castType = getCastType(obj)
+            castType = obj.BaseType.MATLABCastType;
+         end
     end
 end

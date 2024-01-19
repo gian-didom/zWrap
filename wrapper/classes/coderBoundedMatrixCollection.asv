@@ -34,26 +34,14 @@ classdef (HandleCompatible) coderBoundedMatrixCollection < coderBoundedMatrix
         %% function name = getCppArgumentForCall(obj, baseName)
         function name = getCppArgumentForCall(obj, baseName)
 
-            
-                name = {obj.DataType.getCppArgumentForCall(baseName);
-                    obj.SizeType.getCppArgumentForCall(baseName)};
-
-           
+            name = {obj.DataType.getCppArgumentForCall(baseName);
+                obj.SizeType.getCppArgumentForCall(baseName)};
         end
 
         %%
         function td = getCppDeclaration(obj)
-            if isa(obj.SizeType, "coderPrimitive")
-                
-                sizeDecl = char(strcat(getCppDeclaration(obj.SizeType)));
-                sizeDecl = char(strcat(sizeDecl(1:end-1), "[1];"));
-                td = {getCppDeclaration(obj.DataType);
-                    sizeDecl};
-            else
-
-                td = {getCppDeclaration(obj.DataType);
-                    getCppDeclaration(obj.SizeType)};
-            end
+            td = {getCppDeclaration(obj.DataType);
+                getCppDeclaration(obj.SizeType)};
         end
 
         %%
@@ -82,18 +70,14 @@ classdef (HandleCompatible) coderBoundedMatrixCollection < coderBoundedMatrix
                 fprintf('<%s[%i]> (',obj.SizeType.BaseType.Type, obj.SizeType.NumEl);
             end
 
-            if isa(obj.SizeType, "coderPrimitive")
-                fprintf('%ix', 1);
-            else
-                for j=1:numel(obj.SizeType.Dimension)-1
-                    fprintf('%ix', obj.SizeType.Dimension(j));
-                end
-                fprintf('%i %s)\n',  obj.SizeType.Dimension(end), obj.SizeType.BaseType.MATLABType)
-                obj.SizeType.BaseType.printTree(indent+1);
-
+            
+            for j=1:numel(obj.SizeType.Dimension)-1
+                fprintf('%ix', obj.SizeType.Dimension(j));
             end
 
+            fprintf('%i %s)\n',  obj.SizeType.Dimension(end), obj.SizeType.BaseType.MATLABType)
 
+            obj.SizeType.BaseType.printTree(indent+1);
 
         end
     end

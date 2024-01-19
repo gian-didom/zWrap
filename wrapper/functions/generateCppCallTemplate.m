@@ -100,8 +100,26 @@ CppScript = vertcat(CppScript, ...
     sprintf("// Call function"));
 call_prototype_name = sprintf("%s(", inputObj.fcnName);
 
-full_args = [inputObj.Children, outputObj.Children];
+full_args = ([inputObj.Children, outputObj.Children]);
+full_args_unique = [];
+for j=1:numel(full_args)
+    isInOutPort = false;
+    for k=1:numel(full_args_unique)
+        if isequal(full_args(j).originalObject, full_args_unique(k).originalObject) && strcmp(full_args(j).Name, full_args_unique(k).Name)
+            isInOutPort = true;
+            break;
+        end
+    end
 
+    if (isInOutPort)
+        fprintf("Same argument found.")
+    else
+        full_args_unique = [full_args_unique; full_args(j)];
+    end
+
+end
+
+full_args = full_args_unique;
 switch (inputObj.Coder)
     case 'Simulink'
         call_prototype_args = {'&RTM,'};
@@ -126,15 +144,14 @@ for j=1:numel(full_args)
     end
 
 
-    if j<numel(full_args)
-        thisArg = strcat(thisArg, sprintf(", "));
-    end
+    thisArg = strcat(thisArg, sprintf(", "));
 
     call_prototype_args = vertcat(call_prototype_args, ...
         thisArg);
 end
 
-
+endArg = char(call_prototype_args(end));
+call_prototype_args(end) = string(endArg(1:end-2));
 call_prototype_trailer = sprintf(');');
 
 CppScript = vertcat(CppScript, ...
