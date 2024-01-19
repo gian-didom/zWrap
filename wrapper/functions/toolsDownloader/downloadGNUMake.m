@@ -1,8 +1,8 @@
-function [outputArg1,outputArg2] = downloadGNUMake()
+function result = downloadGNUMake()
 %DOWNLOADTOOLS Summary of this function goes here
 %   Detailed explanation goes here
 
-
+result = false;
 
 
 if not(isfolder('tools')); mkdir('tools'); end
@@ -47,6 +47,9 @@ switch computer
         delete(fullfile('tools', 'temp', 'make-master.zip'));
         fprintbf("GNU Make succesfully installed in %s\n", fullfile('tools', 'make'));
 
+        result = true;
+        return;
+
     case 'PCWIN64'
         
         downloadLink = 'https://downloads.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-bin.zip';
@@ -71,6 +74,10 @@ switch computer
         assert(mkStatus == 0, "Was not able to run make. Try to review the installation process or manually install make.exe");
         
         fprintf("GNU make succesfully downloaded.\n");
+
+        result = true;
+        return;
+
     case 'GLNXA64'
 
 end

@@ -24,7 +24,7 @@ switch computer
     case 'PCWIN64'
 
         % Check if OpenSSL is installed.
-        openSSLPaths = {"openssl";
+        openSSLPaths = {fullfile('tools', 'bootgen', 'openssl', 'bin', 'openssl.exe');
                         fullfile('C:', 'Program Files', 'OpenSSL','bin', 'openssl.exe');
                         fullfile('C:', 'Program Files', 'OpenSSL-Win64','bin', 'openssl.exe');
                         };
@@ -64,9 +64,10 @@ switch computer
         end
         
         % Get first useful OpenSSL
-        openSSLDir = openSSLBaseDirs{find(hasLibraries, 1)};
+        openSSLDir = openSSLBaseDirs{find(hasLibraries, 1)}; tmp = what(openSSLDir); openSSLDir = tmp.path;
         openSSLIncludeDir = fullfile(openSSLDir, 'include');
         openSSLLibDir = fullfile(openSSLDir, 'lib');
+        outFlag = true;
 
     case 'GLNXA64'
 
