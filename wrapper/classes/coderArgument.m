@@ -284,7 +284,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
                         % This is the matrix type, but for the 1x1 case it
                         % collapses to a Primitive
                         if all(inobj.Dimensions == 1)
-                            outobj = coderPrimitive(inobj.BaseType);
+                            outobj = coderArgument.processObject2(inobj.BaseType);
                         else
                             outobj = coderFixedMatrix(inobj);
                         end
