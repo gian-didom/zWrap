@@ -1,4 +1,5 @@
 .DS_Store
-wrapper/out/
-tests/
-
+out/
+slprj/
+tools/
+test/
