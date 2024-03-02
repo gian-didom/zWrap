@@ -1,14 +1,14 @@
 classdef ZProject < handle
     %ZProject Summary of this class goes here
     %   Detailed explanation goes here
-
+    
     properties
         settings (1,1)  ZSettings;
         packDir                                 = "";
         inputs          fullInterfaceStructure  = fullInterfaceStructure.empty();
         outputs         fullInterfaceStructure  = fullInterfaceStructure.empty();
     end
-
+    
     properties (SetAccess = private)
         buildInfoStruct;
         codeInfoStruct;
@@ -18,13 +18,13 @@ classdef ZProject < handle
         targetFolder;
         board ZBoard                            = ZBoard.empty();
     end
-
+    
     methods
-
+        
         % =================================================================
         % =================================================================
         % ZProject(args)
-
+        
         function obj = ZProject(args)
             %ZProject Construct an instance of this class
             %   Detailed explanation goes here
@@ -41,35 +41,35 @@ classdef ZProject < handle
                 error('Invalid input argument');
             end
         end
-
-
+        
+        
         % =================================================================
         % =================================================================
         % load(obj) - Loads the buildInfo, codeInfo and compileInfo
         % objects found in the set project path.
-
+        
         function obj = load(obj)
             % load(obj) - Loads the buildInfo, codeInfo and compileInfo
             % objects found in the set project path.
-
+            
             fprintbf('Loading coded project information...');
-
+            
             obj.buildInfoStruct = load(fullfile(obj.settings.path, 'buildInfo.mat'));
             obj.codeInfoStruct = load(fullfile(obj.settings.path, 'codeInfo.mat'), 'codeInfo');
             obj.compileInfoStruct = load(fullfile(obj.settings.path, 'compileInfo.mat'));
-
-
+            
+            
             obj.buildInfo = obj.buildInfoStruct.buildInfo;
             obj.codeInfo = obj.codeInfoStruct.codeInfo;
             
             ZProject.printDone();
-
+            
         end
-
+        
         % =================================================================
         % =================================================================
         % pack(obj) - Create packNGo including all headers
-
+        
         function packDir = pack(obj)
             % pack - Create packNGo including all headers
             if not(obj.settings.pack)
@@ -77,7 +77,7 @@ classdef ZProject < handle
                 zipName = fullfile(obj.settings.path, ...
                     strcat(obj.buildInfo.ComponentName, ".zip"));
                 packDir = fullfile(obj.settings.path, 'pack');
-
+                
                 if (exist(obj.packDir, 'dir'))
                     rmdir(obj.packDir, 's');
                 end
@@ -90,29 +90,29 @@ classdef ZProject < handle
             else
                 packDir = obj.settings.path;
             end
-
+            
             obj.packDir = packDir;
         end
-
+        
         % =================================================================
         % =================================================================
         % commentMains(obj) - Comment out main functions
-
+        
         function commentMains(obj)
             % commentMains(obj) - Comment out main functions
             if isfile(fullfile(obj.packDir, 'ert_main.c'))
                 movefile(fullfile(obj.packDir, 'ert_main.c'), fullfile(obj.packDir, 'ert_main.cbak'));
             end
-
+            
             if isfile(fullfile(obj.packDir, 'ert_main.h'))
                 movefile(fullfile(obj.packDir, 'ert_main.h'), fullfile(obj.packDir, 'ert_main.hbak'));
             end
         end
-
+        
         % =================================================================
         % =================================================================
         % processInput(obj) - process inputs
-
+        
         function processInput(obj)
             obj.inputs = fullInterfaceStructure(obj.codeInfo, 'input');
             obj.inputs.getTotalSize();
@@ -120,12 +120,12 @@ classdef ZProject < handle
             obj.inputs.printTree();
             fprintf('\n\n\n');
         end
-
-
+        
+        
         % =================================================================
         % =================================================================
         % processOutput(obj) - process outputs
-
+        
         function processOutput(obj)
             obj.outputs = fullInterfaceStructure(obj.codeInfo, 'output');
             obj.outputs.getTotalSize();
@@ -133,13 +133,13 @@ classdef ZProject < handle
             obj.outputs.printTree();
             fprintf('\n\n\n');
         end
-
-
+        
+        
         % =================================================================
         % =================================================================
         % generateProjectFolder(obj) - Creates the project folder
-
-        function generateProjectFolder(obj) 
+        
+        function generateProjectFolder(obj)
             fprintbf('Generating project folder...\n');
             targetFolderName = fullfile('out', sprintf("z%s", obj.inputs.fcnName));
             
@@ -152,16 +152,16 @@ classdef ZProject < handle
                     usrInput = input(sprintf("<strong>Folder %s already exists, overwrite?</strong> [Y/n/k] [k]\n", ...
                         targetFolderName), "s");
                 end
-            
-            
+                
+                
                 switch usrInput
-            
+                    
                     case {'Y', 'y'}
                         warning('off', 'MATLAB:rmpath:DirNotFound');
                         rmpath(genpath(targetFolderName))
                         rmdir(targetFolderName, 's')
                         warning('on', 'MATLAB:rmpath:DirNotFound');
-            
+                        
                     case {'K', 'k', ''}
                         new_targetFolderName = targetFolderName;
                         j=1;
@@ -170,12 +170,12 @@ classdef ZProject < handle
                             j = j+1;
                         end
                         targetFolderName = new_targetFolderName;
-            
+                        
                     otherwise
                         fprintf("Aborting.");
                         return
                 end
-
+                
                 
             end
             
@@ -195,52 +195,52 @@ classdef ZProject < handle
         % =================================================================
         % generateInputStreamParser(obj) - Generates the iniput stream
         % parser function
-
+        
         function generateInputStreamParser(obj)
             fprintbf('Generating input stream encoding and test function...');
             obj.inputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.inputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'), true);
             ZProject.printDone();
         end
-
+        
         % =================================================================
         % =================================================================
         % generateOutputStreamParser(obj) - Generates the output stream
         % decoding function
-
+        
         function generateOutputStreamParser(obj)
             fprintbf('Generating output stream decoding and test function...');
             obj.outputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.outputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'), true);
             ZProject.printDone();
         end
-
+        
         % =================================================================
         % =================================================================
-        % generateSimulinkBlock(obj) - Generates the Simulink block 
-
+        % generateSimulinkBlock(obj) - Generates the Simulink block
+        
         function generateSimulinkBlock(obj)
             %% GENERATE INTERFACES
             if (obj.settings.nosimulink)
                 fprintbf("Skipping Simulink generation...\n");
             else
-            fprintbf('Generating Simulink library...')
-            SimulinkLibraryPath = fullfile(obj.targetFolder, 'simulink', sprintf('%s.slx', obj.inputs.fcnName));
-            % TODO: Use a ZSimulinkGenerator object!
-            generateSimulinkLibrary(obj.inputs, obj.outputs, SimulinkLibraryPath);
-            ZProject.printDone();
-            fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
+                fprintbf('Generating Simulink library...')
+                SimulinkLibraryPath = fullfile(obj.targetFolder, 'simulink', sprintf('%s.slx', obj.inputs.fcnName));
+                % TODO: Use a ZSimulinkGenerator object!
+                generateSimulinkLibrary(obj.inputs, obj.outputs, SimulinkLibraryPath);
+                ZProject.printDone();
+                fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
             end
         end
-
+        
         % =================================================================
         % =================================================================
         % build(obj) - Builds the project
-
-        function build(obj) 
+        
+        function build(obj)
             %% BUILD THE PROJECT running the toolchain associated to the board.
             fprintbf('Building project...\n');
-            try 
+            try
                 obj.board.build();
             catch ME
                 fprintbf('Error building project: %s\n', ME.message);
@@ -251,21 +251,21 @@ classdef ZProject < handle
         end
         
     end
-
+    
     methods (Static = true)
         % =================================================================
         % =================================================================
-
+        
         function printDone()
             if desktop('-inuse')
-            fprintbf('\t✓ Done.\n');
+                fprintbf('\t✓ Done.\n');
             else
-            % Print in bold and green using terminal CLI tags - not <strong> tags
-            fprintf('\033[1;32m\t✓ Done.\033[0m\n');
+                % Print in bold and green using terminal CLI tags - not <strong> tags
+                fprintf('\033[1;32m\t✓ Done.\033[0m\n');
             end
-
+            
         end
     end
-
+    
 end
 
