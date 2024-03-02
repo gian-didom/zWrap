@@ -33,8 +33,8 @@ myProject.pack();
 myProject.processInput();
 myProject.processOutput();
 myProject.generateProjectFolder();
-myProject.generateInputStreamParser();  % TODO: Change name in "serializer"
-myProject.generateOutputStreamParser(); % TODO: Change name in "deserializer"
+myProject.generateInputSerializer();
+myProject.generateOutputParser();
 
 % Initialize board object
 myBoard = ZedBoard();

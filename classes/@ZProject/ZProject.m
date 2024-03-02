@@ -193,10 +193,10 @@ classdef ZProject < handle
         
         % =================================================================
         % =================================================================
-        % generateInputStreamParser(obj) - Generates the iniput stream
+        % generateInputSerializer(obj) - Generates the iniput stream
         % parser function
         
-        function generateInputStreamParser(obj)
+        function generateInputSerializer(obj)
             fprintbf('Generating input stream encoding and test function...');
             obj.inputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.inputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'), true);
@@ -205,10 +205,10 @@ classdef ZProject < handle
         
         % =================================================================
         % =================================================================
-        % generateOutputStreamParser(obj) - Generates the output stream
+        % generateOutputParser(obj) - Generates the output stream
         % decoding function
         
-        function generateOutputStreamParser(obj)
+        function generateOutputParser(obj)
             fprintbf('Generating output stream decoding and test function...');
             obj.outputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.outputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'), true);

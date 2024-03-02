@@ -242,7 +242,7 @@ classdef zWrapProject < handle
         % =================================================================
         % =================================================================
         
-        function generateInputStreamParser(obj)
+        function generateInputSerializer(obj)
             fprintbf('Generating input stream encoding and test function...');
             obj.inputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.inputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'), true);
@@ -252,7 +252,7 @@ classdef zWrapProject < handle
         % =================================================================
         % =================================================================
         
-        function generateOutputStreamParser(obj)
+        function generateOutputParser(obj)
             fprintbf('Generating output stream decoding and test function...');
             obj.outputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.outputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'), true);
