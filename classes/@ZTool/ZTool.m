@@ -138,9 +138,9 @@ classdef ZTool < handle
             [~, cmPATH] = system("echo %PATH%");
             [~, psPATH] = system("powershell $Env:Path");
             pathList = split(strcat(cmPATH, psPATH), ':');
-            uniquePathList = removeDuplicatePaths(pathList);
+            % uniquePathList = removeDuplicatePaths(pathList);
             
-            return
+            
             
             % TODO: Move this into the Xilinx tool object
             % Xilinx default paths
@@ -176,6 +176,9 @@ classdef ZTool < handle
             pathList = vertcat(possibleXilinxPaths, pathList);
             pathList = cellfun(@(x) char(x), pathList, 'UniformOutput',false);
             
+
+            % Remove duplicates
+            uniquePathList = removeDuplicatePaths(pathList);
             
         end
         
