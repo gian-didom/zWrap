@@ -4,7 +4,7 @@ classdef ZTool < handle
         name = ""
         foldername = ""
         description = ""
-
+        
         % The ZToolManager that owns this tool
         supportsWin = false;
         supportsLinux = false;
@@ -14,7 +14,7 @@ classdef ZTool < handle
         
         path = "";
         execpath = "";
-
+        
         fail = @error;
         project ZProject = ZProject.empty();
     end
@@ -27,9 +27,9 @@ classdef ZTool < handle
             % obj.project = project;
         end
         
-
+        
     end
-
+    
     methods (Access = private)
         % Methods implemenation in folders to avoid cluttering the file
         % These should be overridden, or throw an error.
@@ -55,7 +55,7 @@ classdef ZTool < handle
         % ========================================================================
         % Name getter interface - must be implemented for all subclasses
         execName = execFile();
-    
+        
     end
     
     % Utility methods - static methods to be called in subclasses
@@ -138,47 +138,47 @@ classdef ZTool < handle
             [~, cmPATH] = system("echo %PATH%");
             [~, psPATH] = system("powershell $Env:Path");
             pathList = split(strcat(cmPATH, psPATH), ':');
-            % uniquePathList = removeDuplicatePaths(pathList);
+            uniquePathList = removeDuplicatePaths(pathList);
             
             
             
             % TODO: Move this into the Xilinx tool object
             % Xilinx default paths
-            possibleVersions = {2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023};
-            possibleSubVersions = {1, 2};
-            possibleSoftware = {"Vitis", "Vivado"};
-            possibleSubPaths = {fullfile("gnu", "aarch32", "nt", "gcc-arm-none-eabi", "bin"), fullfile("gnuwin", "bin"), fullfile("bin")};
-            possibleXilinxPaths = {"C:\Program Files\Xilinx"};
-            if not(isempty(zSettings.customXilinxPath))
-                possibleXilinxPaths{end+1} = zSettings.customXilinxPath;
-                flip(possibleXilinxPaths);
-            end
-            [vi, svi, swi, spi, xpi] = ndgrid(1:numel(possibleVersions), ...
-                1:numel(possibleSubVersions), ...
-                1:numel(possibleSoftware), ...
-                1:numel(possibleSubPaths), ...
-                1:numel(possibleXilinxPaths));
-            
-            nPerms = numel(vi);
-            possiblePerms = [reshape(possibleXilinxPaths(xpi(:)), [], 1), ...
-                reshape(possibleSoftware(swi(:)), [], 1), ...
-                reshape(possibleVersions(vi(:)), [], 1), ...
-                reshape(possibleSubVersions(svi(:)), [], 1), ...
-                reshape(possibleSubPaths(spi(:)), [], 1)];
-            % Xilinx Path -- Software -- Version.Subversion -- SubPath
-            possibleXilinxPaths = arrayfun(@(x) fullfile(possiblePerms{x, 1}, ...
-                possiblePerms{x,2}, ...
-                sprintf("%i.%i", possiblePerms{x,3}, possiblePerms{x, 4}), ...
-                possiblePerms{x, 5}), ...
-                reshape(1:nPerms, [], 1));
-            
-            
-            pathList = vertcat(possibleXilinxPaths, pathList);
-            pathList = cellfun(@(x) char(x), pathList, 'UniformOutput',false);
-            
-
-            % Remove duplicates
-            uniquePathList = removeDuplicatePaths(pathList);
+            % possibleVersions = {2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023};
+            % possibleSubVersions = {1, 2};
+            % possibleSoftware = {"Vitis", "Vivado"};
+            % possibleSubPaths = {fullfile("gnu", "aarch32", "nt", "gcc-arm-none-eabi", "bin"), fullfile("gnuwin", "bin"), fullfile("bin")};
+            % possibleXilinxPaths = {"C:\Program Files\Xilinx"};
+            % if not(isempty(zSettings.customXilinxPath))
+            %     possibleXilinxPaths{end+1} = zSettings.customXilinxPath;
+            %     flip(possibleXilinxPaths);
+            % end
+            % [vi, svi, swi, spi, xpi] = ndgrid(1:numel(possibleVersions), ...
+            %     1:numel(possibleSubVersions), ...
+            %     1:numel(possibleSoftware), ...
+            %     1:numel(possibleSubPaths), ...
+            %     1:numel(possibleXilinxPaths));
+            %
+            % nPerms = numel(vi);
+            % possiblePerms = [reshape(possibleXilinxPaths(xpi(:)), [], 1), ...
+            %     reshape(possibleSoftware(swi(:)), [], 1), ...
+            %     reshape(possibleVersions(vi(:)), [], 1), ...
+            %     reshape(possibleSubVersions(svi(:)), [], 1), ...
+            %     reshape(possibleSubPaths(spi(:)), [], 1)];
+            % % Xilinx Path -- Software -- Version.Subversion -- SubPath
+            % possibleXilinxPaths = arrayfun(@(x) fullfile(possiblePerms{x, 1}, ...
+            %     possiblePerms{x,2}, ...
+            %     sprintf("%i.%i", possiblePerms{x,3}, possiblePerms{x, 4}), ...
+            %     possiblePerms{x, 5}), ...
+            %     reshape(1:nPerms, [], 1));
+            %
+            %
+            % pathList = vertcat(possibleXilinxPaths, pathList);
+            % pathList = cellfun(@(x) char(x), pathList, 'UniformOutput',false);
+            %
+            %
+            % % Remove duplicates
+            % uniquePathList = removeDuplicatePaths(pathList);
             
         end
         
