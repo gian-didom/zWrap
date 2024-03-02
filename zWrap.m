@@ -33,7 +33,7 @@ compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
 
 buildInfo = buildInfoStruct.buildInfo;
 codeInfo = codeInfoStruct.codeInfo;
-printDone();
+ZProject.printDone();
 
 % Create packNGo including all headers
 
@@ -51,7 +51,7 @@ if not(zSettings.pack)
         'fileName', zipName);
     unzip(zipName, packDir);
     fprintbf('All code succesfully packed in %s', packDir);
-    printDone();
+    ZProject.printDone();
 else
     packDir = coder_project_path;
 end
@@ -76,18 +76,18 @@ oss = fullInterfaceStructure(codeInfo, 'output');
 oss.getTotalSize();
 oss.getTotalSizePadded()
 oss.printTree();
-printDone();
+ZProject.printDone();
 
 % Get padding thanks to  GDB
 fprintbf('Compiling and checking with gcc...\n');
 %% RETRIEVE INPUT AND OUTPUT INFORMATION
 fprintbf('Analyzing function inputs...\t\t');
 [numInputs, nameInputs, typeInputs, sizeInputs] = getNumberOfInputs(codeInfo);       % Inputs
-printDone();
+ZProject.printDone();
 
 fprintbf('Analyzing function outputs...\t\t');
 [numOutputs, nameOutputs, typeOutputs, sizeOutputs] = getNumberOfOutputs(codeInfo);   % Outputs
-printDone();
+ZProject.printDone();
 
 codedInputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
     nameInputs, typeInputs, sizeInputs);
@@ -185,21 +185,21 @@ fprintbf("Project folder generated at %s\n", targetFolderName);
 fprintbf('Generating input stream encoding and test function...');
 iss.generateMATLABFunction(fullfile(targetFolderName, 'simulink'));
 iss.generateDecoderFunction(fullfile(targetFolderName, 'simulink'), true);
-printDone();
+ZProject.printDone();
 
 fprintbf('Generating output stream decoding and test function...');
 oss.generateDecoderFunction(fullfile(targetFolderName, 'simulink'));
 oss.generateMATLABFunction(fullfile(targetFolderName, 'simulink'), true);
-printDone();
+ZProject.printDone();
 
 fprintbf('Generating C++ memory structure mapping header...');
 generateCppMemoryMapping(iss, oss, fullfile(targetFolderName, 'generated', 'memorymap.h'));
-printDone();
+ZProject.printDone();
 
 fprintbf('Generating C++ entry point header and function...');
 generateCppCallTemplate(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.c'));
 generateCppCallHeader(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.h'));
-printDone();
+ZProject.printDone();
 
 %% EXTENSIONS: CODEGEN
 
@@ -259,7 +259,7 @@ else
 fprintbf('Generating Simulink library...')
 SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', iss.fcnName));
 generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
-printDone();
+ZProject.printDone();
 fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
 end
 
@@ -271,7 +271,7 @@ buildVar = 'Release';
     cmdsep, ...
     zEnv.makeBin), ...
     "-echo");
-printDone();
+ZProject.printDone();
 %% RUN TESTS
 
 % Test 1: hard-coded memory address is the one obtained from the Core 1

@@ -9,7 +9,7 @@ classdef ZProject < handle
         outputs         fullInterfaceStructure  = fullInterfaceStructure.empty();
     end
 
-    properties (Access = private)
+    properties (SetAccess = private)
         buildInfoStruct;
         codeInfoStruct;
         compileInfoStruct;
@@ -62,7 +62,7 @@ classdef ZProject < handle
             obj.buildInfo = obj.buildInfoStruct.buildInfo;
             obj.codeInfo = obj.codeInfoStruct.codeInfo;
             
-            obj.printDone();
+            ZProject.printDone();
 
         end
 
@@ -86,7 +86,7 @@ classdef ZProject < handle
                     'fileName', zipName);
                 unzip(zipName, obj.packDir);
                 fprintbf('All code succesfully packed in %s', obj.packDir);
-                obj.printDone();
+                ZProject.printDone();
             else
                 packDir = obj.settings.path;
             end
@@ -200,7 +200,7 @@ classdef ZProject < handle
             fprintbf('Generating input stream encoding and test function...');
             obj.inputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.inputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'), true);
-            obj.printDone();
+            ZProject.printDone();
         end
 
         % =================================================================
@@ -212,7 +212,7 @@ classdef ZProject < handle
             fprintbf('Generating output stream decoding and test function...');
             obj.outputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.outputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'), true);
-            obj.printDone();
+            ZProject.printDone();
         end
 
         % =================================================================
@@ -228,7 +228,7 @@ classdef ZProject < handle
             SimulinkLibraryPath = fullfile(obj.targetFolder, 'simulink', sprintf('%s.slx', obj.inputs.fcnName));
             % TODO: Use a ZSimulinkGenerator object!
             generateSimulinkLibrary(obj.inputs, obj.outputs, SimulinkLibraryPath);
-            obj.printDone();
+            ZProject.printDone();
             fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
             end
         end
@@ -246,7 +246,7 @@ classdef ZProject < handle
                 fprintbf('Error building project: %s\n', ME.message);
                 return
             end
-            obj.printDone();
+            ZProject.printDone();
             
         end
         

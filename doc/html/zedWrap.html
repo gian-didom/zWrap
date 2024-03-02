@@ -165,7 +165,7 @@ compileInfoStruct = load(fullfile(coder_project_path, <span class="string">'comp
 
 buildInfo = buildInfoStruct.buildInfo;
 codeInfo = codeInfoStruct.codeInfo;
-printDone();
+ZProject.printDone();
 
 <span class="comment">% Create packNGo including all headers</span>
 fprintbf(<span class="string">'Packing code including all headers... '</span>);
@@ -181,7 +181,7 @@ packNGo(fullfile(coder_project_path, <span class="string">'buildInfo.mat'</span>
     <span class="string">'fileName'</span>, zipName);
 unzip(zipName, packDir);
 fprintbf(<span class="string">'All code succesfully packed in %s'</span>, packDir);
-printDone();
+ZProject.printDone();
 </pre><pre class="codeoutput">&lt;strong&gt;Loading coded project information...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
 &lt;/strong&gt;&lt;strong&gt;Packing code including all headers... &lt;/strong&gt;&lt;strong&gt;All code succesfully packed in /Users/gianfry/Documents/DLR/ZedWrapper/wrapper/test/variableSin/codegen/lib/variableSine/pack&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
 &lt;/strong&gt;</pre><h2 id="6">GET INPUT OBJECT</h2><pre class="codeinput">fprintbf(<span class="string">'Building interface structure objects...'</span>);
@@ -195,7 +195,7 @@ oss = fullInterfaceStructure(codeInfo, <span class="string">'output'</span>);
 oss.getTotalSize();
 oss.getTotalSizePadded()
 oss.printTree();
-printDone();
+ZProject.printDone();
 
 <span class="comment">% Get padding thanks to  GDB</span>
 fprintbf(<span class="string">'Compiling and checking with gcc...\n'</span>);
@@ -223,11 +223,11 @@ ans =
 &lt;/strong&gt;&lt;strong&gt;Compiling and checking with gcc...
 &lt;/strong&gt;</pre><h2 id="7">RETRIEVE INPUT AND OUTPUT INFORMATION</h2><pre class="codeinput">fprintbf(<span class="string">'Analyzing function inputs...\n'</span>);
 [numInputs, nameInputs, typeInputs, sizeInputs] = getNumberOfInputs(codeInfo);       <span class="comment">% Inputs</span>
-printDone();
+ZProject.printDone();
 
 fprintbf(<span class="string">'Analyzing function outputs...\n'</span>);
 [numOutputs, nameOutputs, typeOutputs, sizeOutputs] = getNumberOfOutputs(codeInfo);   <span class="comment">% Outputs</span>
-printDone();
+ZProject.printDone();
 
 codedInputs = arrayfun(@(a,b,c) struct(<span class="string">'name'</span>, a, <span class="string">'type'</span>, b', <span class="string">'size'</span>, c), <span class="keyword">...</span>
     nameInputs, typeInputs, sizeInputs);
@@ -304,21 +304,21 @@ fprintbf(<span class="string">"Project folder generated at %s\n"</span>, targetF
 &lt;/strong&gt;</pre><h2 id="9">GENERATE INPUT STREAM PARSER</h2><p>The inputs should be mapped in the shared memory region.</p><pre class="codeinput">fprintbf(<span class="string">'Generating input stream encoding and test function...'</span>);
 iss.generateMATLABFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_in.m'</span>));
 iss.generateDecoderFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_in_test.m'</span>));
-printDone();
+ZProject.printDone();
 
 fprintbf(<span class="string">'Generating output stream decoding and test function...'</span>);
 oss.generateDecoderFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_out.m'</span>));
 oss.generateMATLABFunction(fullfile(targetFolderName, <span class="string">'simulink'</span>, <span class="string">'prova_out_test.m'</span>));
-printDone();
+ZProject.printDone();
 
 fprintbf(<span class="string">'Generating C++ memory structure mapping header...'</span>);
 generateCppMemoryMapping(iss, oss, fullfile(targetFolderName, <span class="string">'generated'</span>, <span class="string">'memorymap.h'</span>));
-printDone();
+ZProject.printDone();
 
 fprintbf(<span class="string">'Generating C++ entry point header and function...'</span>);
 generateCppCallTemplate(iss, oss, fullfile(targetFolderName, <span class="string">'generated'</span>, <span class="string">'callFunction.c'</span>));
 generateCppCallHeader(iss, oss, fullfile(targetFolderName, <span class="string">'generated'</span>, <span class="string">'callFunction.h'</span>));
-printDone();
+ZProject.printDone();
 </pre><pre class="codeoutput">&lt;strong&gt;Generating input stream encoding and test function...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
 &lt;/strong&gt;&lt;strong&gt;Generating output stream decoding and test function...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
 &lt;/strong&gt;&lt;strong&gt;Generating C++ memory structure mapping header...&lt;/strong&gt;&lt;strong&gt;	&#10003; Done.
@@ -1678,7 +1678,7 @@ compileInfoStruct = load(fullfile(coder_project_path, 'compileInfo.mat'));
 
 buildInfo = buildInfoStruct.buildInfo;
 codeInfo = codeInfoStruct.codeInfo;
-printDone();
+ZProject.printDone();
 
 % Create packNGo including all headers
 fprintbf('Packing code including all headers... ');
@@ -1694,7 +1694,7 @@ packNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
     'fileName', zipName);
 unzip(zipName, packDir);
 fprintbf('All code succesfully packed in %s', packDir);
-printDone();
+ZProject.printDone();
 
 
 %% GET INPUT OBJECT
@@ -1709,18 +1709,18 @@ oss = fullInterfaceStructure(codeInfo, 'output');
 oss.getTotalSize();
 oss.getTotalSizePadded()
 oss.printTree();
-printDone();
+ZProject.printDone();
 
 % Get padding thanks to  GDB
 fprintbf('Compiling and checking with gcc...\n');
 %% RETRIEVE INPUT AND OUTPUT INFORMATION
 fprintbf('Analyzing function inputs...\n');
 [numInputs, nameInputs, typeInputs, sizeInputs] = getNumberOfInputs(codeInfo);       % Inputs
-printDone();
+ZProject.printDone();
 
 fprintbf('Analyzing function outputs...\n');
 [numOutputs, nameOutputs, typeOutputs, sizeOutputs] = getNumberOfOutputs(codeInfo);   % Outputs
-printDone();
+ZProject.printDone();
 
 codedInputs = arrayfun(@(a,b,c) struct('name', a, 'type', b', 'size', c), ...
     nameInputs, typeInputs, sizeInputs);
@@ -1794,21 +1794,21 @@ fprintbf("Project folder generated at %s\n", targetFolderName);
 fprintbf('Generating input stream encoding and test function...');
 iss.generateMATLABFunction(fullfile(targetFolderName, 'simulink', 'prova_in.m'));
 iss.generateDecoderFunction(fullfile(targetFolderName, 'simulink', 'prova_in_test.m'));
-printDone();
+ZProject.printDone();
 
 fprintbf('Generating output stream decoding and test function...');
 oss.generateDecoderFunction(fullfile(targetFolderName, 'simulink', 'prova_out.m'));
 oss.generateMATLABFunction(fullfile(targetFolderName, 'simulink', 'prova_out_test.m'));
-printDone();
+ZProject.printDone();
 
 fprintbf('Generating C++ memory structure mapping header...');
 generateCppMemoryMapping(iss, oss, fullfile(targetFolderName, 'generated', 'memorymap.h'));
-printDone();
+ZProject.printDone();
 
 fprintbf('Generating C++ entry point header and function...');
 generateCppCallTemplate(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.c'));
 generateCppCallHeader(iss, oss, fullfile(targetFolderName, 'generated', 'callFunction.h'));
-printDone();
+ZProject.printDone();
 
 
 %% GENERATE BOARD BUILD

@@ -14,12 +14,12 @@ classdef ZedBoard < ZBoard
             obj.name = "ZedBoard";
 
             % Tools
-            obj.tools.make = ZGNUMake();        % GNU make
-            obj.tools.armtools = ZARMTools();   % Arm tools
-            obj.tools.bootgen = ZBootgen();     % Bootgen
+            obj.addTool(ZGNUMake());        % GNU make
+            obj.addTool(ZARMTools());       % ARM tools
+            obj.addTool(ZBootgen());        % Bootgen
             
             % Extensions
-            obj.extensions.timing = timingExtension(obj);
+            obj.addExtension(timingExtension(obj));
 
             % Coder configuration
             % TODO: Add coder configuration (load or write)

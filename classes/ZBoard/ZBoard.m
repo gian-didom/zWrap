@@ -1,12 +1,16 @@
 classdef ZBoard < handle
-    properties
+    properties (Access = private)
         % Define properties here
         coderConfig                               % Coder configuration object to use for this board
         name                                      % Name of the board
-        tools struct                              % Needed tools
+        
+    end
+    
+    properties
+        % Define properties here
         extensions struct                         % Supported extensions
+        tools struct                              % Needed tools
         project ZProject    = ZProject.empty()    % Associated project
-
     end
     
     methods
@@ -14,6 +18,14 @@ classdef ZBoard < handle
 
         function obj = ZBoard()
             % Class constructor
+        end
+
+        function addTool(obj, tool)
+            obj.tools(1).(tool.name) = tool;
+        end
+
+        function addExtension(obj, extension)
+            obj.extensions(1).(extension.name) = extension;
         end
 
 

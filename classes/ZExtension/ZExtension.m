@@ -4,9 +4,13 @@ classdef ZExtension
         board ZBoard;
     end
 
-    methods
-        function obj = ZExtension()
+    properties (Access = private)
+        name
+    end
 
+    methods
+        function obj = ZExtension(board)
+            obj.board = board;
         end
 
         function io(obj)

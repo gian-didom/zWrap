@@ -39,13 +39,13 @@ classdef (HandleCompatible) coderArgumentFactory
                 % This block is executed in case the passed object is of
                 % type RTW.DataInterface. This kind of objects represent level-0 MATLAB inputs.
                 % They have to be represented as fields of the parent input structure.
-                outobj = coderArgument.processRTWDataInterface(inobj, varargin); % Delegate to RTW object factory.
+                outobj = coderArgumentFactory.processRTWDataInterface(inobj, varargin); % Delegate to RTW object factory.
                 return;
                 
             else % is a plain object.
                 % This is a deeper-level nested object or reduced variable
                 % and does not require special implementation.
-                outobj = coderArgument.processPlainObject(inobj, varargin);
+                outobj = coderArgumentFactory.processPlainObject(inobj, varargin);
                 return;
                 
             end

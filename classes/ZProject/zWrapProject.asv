@@ -62,7 +62,7 @@ classdef zWrapProject < handle
             obj.buildInfo = obj.buildInfoStruct.buildInfo;
             obj.codeInfo = obj.codeInfoStruct.codeInfo;
             
-            obj.printDone();
+            ZProject.printDone();
 
         end
 
@@ -86,7 +86,7 @@ classdef zWrapProject < handle
                     'fileName', zipName);
                 unzip(zipName, obj.packDir);
                 fprintbf('All code succesfully packed in %s', obj.packDir);
-                printDone();
+                ZProject.printDone();
             else
                 packDir = coder_project_path;
             end
@@ -246,7 +246,7 @@ classdef zWrapProject < handle
             fprintbf('Generating input stream encoding and test function...');
             obj.inputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.inputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'), true);
-            printDone();
+            ZProject.printDone();
         end
 
         % =================================================================
@@ -256,7 +256,7 @@ classdef zWrapProject < handle
             fprintbf('Generating output stream decoding and test function...');
             obj.outputs.generateDecoderFunction(fullfile(obj.targetFolder, 'simulink'));
             obj.outputs.generateMATLABFunction(fullfile(obj.targetFolder, 'simulink'), true);
-            printDone();
+            ZProject.printDone();
         end
         
         % =================================================================
@@ -265,7 +265,7 @@ classdef zWrapProject < handle
         function generateMemoryMap(obj)
             fprintbf('Generating memory structure mapping header...');
             generateCppMemoryMapping(obj.inputs, obj.outputs, fullfile(obj.targetFolder, 'generated', 'memorymap.h'));
-            printDone();
+            ZProject.printDone();
         end
 
         % =================================================================
@@ -275,7 +275,7 @@ classdef zWrapProject < handle
             fprintbf('Generating C++ entry point header and function...');
             generateCppCallTemplate(obj.inputs, obj.outputs, fullfile(obj.targetFolder, 'generated', 'callFunction.c'));
             generateCppCallHeader(obj.inputs, obj.outputs, fullfile(obj.targetFolder, 'generated', 'callFunction.h'));
-            printDone();
+            ZProject.printDone();
         end
     end
 
@@ -283,7 +283,7 @@ classdef zWrapProject < handle
         % =================================================================
         % =================================================================
 
-        function printDone()
+        function ZProject.printDone()
             fprintbf('\t✓ Done.\n');
         end
     end

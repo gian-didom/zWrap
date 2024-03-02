@@ -5,7 +5,7 @@ function CppScript = generateMemoryMap(obj, save_file_path)
         save_file_path = fullfile(obj.project.targetFolder, 'generated', 'memorymap.h');
     end
 
-    fprintbf('Generating memory structure mapping header...');
+    fprintbf('Generating memory structure mapping header...\t');
 
 
     % Path info
@@ -70,6 +70,8 @@ function CppScript = generateMemoryMap(obj, save_file_path)
     fid = fopen(save_file_path, 'w');
     fprintf(fid, "%s\n", CppScript);
     fclose(fid);
+
+    ZProject.printDone();
     
     % Wait for save file path to exist
     while not(exist(save_file_path, 'file'))
@@ -82,7 +84,7 @@ function CppScript = generateMemoryMap(obj, save_file_path)
         h.close
     end
     
-    printDone();
+    ZProject.printDone();
 
     
     end

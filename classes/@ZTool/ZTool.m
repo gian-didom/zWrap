@@ -1,12 +1,10 @@
 classdef ZTool < handle
     
-    properties
+    properties (Access = private)
         name = ""
         foldername = ""
         description = ""
-    end
-    
-    properties (SetAccess = private, Hidden = false)
+
         % The ZToolManager that owns this tool
         supportsWin = false;
         supportsLinux = false;
@@ -16,9 +14,7 @@ classdef ZTool < handle
         
         path = "";
         execpath = "";
-    end
-    
-    properties (Access = private)
+
         fail = @error;
         project ZProject = ZProject.empty();
     end
@@ -27,28 +23,16 @@ classdef ZTool < handle
         % ========================================================================
         % Constructor
         
-        function obj = ZTool(project)
-            obj.project = project;
+        function obj = ZTool()
+            % obj.project = project;
         end
+        
 
-        % Methods implemenation in folders to avoid cluttering the file
     end
-    
-    
-    methods (Abstract)
-        
-        % ========================================================================
-        % Name getter interface - must be implemented for all subclasses
-        function execName = execFile()
-            % Check platform
-            switch computer
-                case 'MACA64';  execName = "null";
-                case 'GLNXA64'; execName = "null";
-                case 'PCWIN64'; execName = "null.exe";
-                otherwise;      error("Architecture not supported for execution.")
-            end
-        end
-        
+
+    methods (Access = private)
+        % Methods implemenation in folders to avoid cluttering the file
+        % These should be overridden, or throw an error.
         % MacOS
         function installMac(obj)
             obj.fail("Installation procedure not implemented for %s on MacOS", obj.name);
@@ -63,8 +47,15 @@ classdef ZTool < handle
         function installWin(obj)
             obj.fail("Installation procedure not implemented for %s on Windows", obj.name);
         end
+    end
+    
+    
+    methods (Abstract)
         
-        
+        % ========================================================================
+        % Name getter interface - must be implemented for all subclasses
+        execName = execFile();
+    
     end
     
     % Utility methods - static methods to be called in subclasses

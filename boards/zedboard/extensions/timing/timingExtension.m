@@ -1,20 +1,21 @@
 classdef timingExtension < ZExtension
-
+    
     properties
+        name = "timing";
     end
-
+    
     methods
         function obj = timingExtension(board)
             obj = obj@ZExtension(board);
         end
-
-        function io(obj) 
-    
+        
+        function io(obj)
+            
             % Generate dummy codeInfoObj
             codeInfoObj.Name = 'double';
             codeInfoObj.WordLength = 64;
             codeInfoObj.Identifier = 'double';
-    
+            
             % Add a double argument to obj.board.project.outputs
             obj.board.project.outputs.Children(end+1) = coderPrimitive(codeInfoObj);
             obj.board.project.outputs.Children(end).Role = 'output';
@@ -22,10 +23,10 @@ classdef timingExtension < ZExtension
             obj.board.project.outputs.Children(end).MATLABName = 'computationalTime';
             
             obj.board.project.outputs.getTotalSizePadded();
-    
+            
             % TODO: Add addArgument object
         end
-
+        
         function codegen(obj)
             targetFolder = obj.board.project.targetFolder;
             fileLines = split(fileread(fullfile(targetFolder, "generated", 'callFunction.c')), newline);
@@ -43,39 +44,39 @@ classdef timingExtension < ZExtension
                 % There's an argument after, no need to remove commas
                 fileLines(contains(fileLines, 'pO->computationalTime')) = [];
             end
-    
+            
             % Add the tic()
             callFunctionLine = find(contains(fileLines, '// Call function'), 1);
             endCallFunctionLine = find(contains(fileLines, "// End of function call"), 1);
             ticLine = sprintf("    double t; \ntic(&t);");
             tocLine = "    pO->computationalTime = toc(t);";
-            includeLines = {'#include "tic.h"'; 
-                            '#include "toc.h"'; 
-                            "extern void tic(double* t);";
-                            "extern double toc(double* t);"};
+            includeLines = {'#include "tic.h"';
+                '#include "toc.h"';
+                "extern void tic(double* t);";
+                "extern double toc(double* t);"};
             fileLines = vertcat(includeLines, ...
-                            fileLines(1:callFunctionLine-1), ...
-                            ticLine, ...
-                            fileLines(callFunctionLine:endCallFunctionLine), ...
-                            tocLine, ...
-                            fileLines(endCallFunctionLine+1:end));
-    
+                fileLines(1:callFunctionLine-1), ...
+                ticLine, ...
+                fileLines(callFunctionLine:endCallFunctionLine), ...
+                tocLine, ...
+                fileLines(endCallFunctionLine+1:end));
+            
             fid = fopen(fullfile(targetFolder, "generated", 'callFunction.c'), 'w');
             fprintf(fid, "%s\n", fileLines);
             fclose(fid);
-    
+            
             % Wait for save file path to exist
             pause(1);
             function_saved_path = which(fullfile(targetFolder, "generated", 'callFunction.c'));
-    
+            
             if (desktop('-inuse'))
-h = matlab.desktop.editor.openDocument(function_saved_path);
-            h.smartIndentContents;
-            h.save;
-            h.close
-end;
+                h = matlab.desktop.editor.openDocument(function_saved_path);
+                h.smartIndentContents;
+                h.save;
+                h.close
+            end
             
         end
-
+        
     end
 end

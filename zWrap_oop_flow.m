@@ -3,7 +3,7 @@ addpath(genpath('classes'));
 addpath(genpath('functions'));
 addpath(genpath('boards/zedboard'));
 
-path_to_folder = "/Users/gianfry/Documents/DLR/zWrap/wrapper/test/VMyfVoJrTg_fun/predictMixed051";
+path_to_folder = "/Users/gianfry/Documents/DLR/zWrap/test/VMyfVoJrTg_fun/predictMixed051";
 
 mySettings = ZSettings(sprintf("-path %s -pack -y", path_to_folder)); 
 myBoard = ZBoard();   % This should a) Download the necessary files/pull the requested stuff from the server, b) create the board object
