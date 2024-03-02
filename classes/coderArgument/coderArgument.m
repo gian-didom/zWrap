@@ -263,7 +263,7 @@ classdef (HandleCompatible) coderArgument < matlab.mixin.Heterogeneous & handle
         %% ========================================================================
         
 
-        
+
         %% methods(Static) --------------------------------------------------------
         %% function outobj = processRTWDataInterface(inobj, varargin)
         function outobj = processRTWDataInterface(inobj, varargin)
