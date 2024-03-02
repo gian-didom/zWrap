@@ -17,7 +17,7 @@ classdef (HandleCompatible) fullOutputStructure < coderNestedObject
                     obj.Padding = 0;
                     obj.Children = [];
                     for j=1:numel(codeInfoObject.Outports)
-                        output = coderArgument.processObject(codeInfoObject.Outports(j));
+                        output = coderArgumentFactory.processObject(codeInfoObject.Outports(j));
                         obj.Children = appendCell(obj.Children, output);
                     end
         end

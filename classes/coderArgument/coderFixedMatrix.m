@@ -18,7 +18,7 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
             %   Detailed explanation goes here
             obj.Dimension = codeInfoObj.Dimensions;
             obj.NumEl = prod(obj.Dimension);
-            obj.BaseType = coderArgument.processObject(codeInfoObj.BaseType);
+            obj.BaseType = coderArgumentFactory.processObject(codeInfoObj.BaseType);
             obj.Type = obj.BaseType.Type;
 
             if strcmp(obj.BaseType.MATLABType, 'cell')

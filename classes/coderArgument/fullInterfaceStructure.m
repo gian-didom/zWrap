@@ -50,7 +50,7 @@ classdef (HandleCompatible) fullInterfaceStructure < coderNestedObject
                 % - Could check after the object expansion, before
                 %   assigning
 
-                output = coderArgument.processObject(codeInfoObject.(fieldToLook)(j));
+                output = coderArgumentFactory.processObject(codeInfoObject.(fieldToLook)(j));
 
                 indexPrototype = strcmp(output.argNames{1}, ...
                     {codeInfoObject.OutputFunctions(1).Prototype.Arguments.Name});

@@ -27,7 +27,7 @@ classdef (HandleCompatible) coderInputStructure
                 % Call the coderArgument static method processObject.
                 % It will release a subclass of coderArgument with the
                 % associated type
-                output = coderArgument.processObject(codeInfoObject.Inports(j));
+                output = coderArgumentFactory.processObject(codeInfoObject.Inports(j));
                 
                 % Append to Children object
                 obj.Children = horzcat(obj.Children, output);

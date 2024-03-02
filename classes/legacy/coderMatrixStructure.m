@@ -14,7 +14,7 @@ classdef (HandleCompatible) coderMatrixStructure < coderArgument
             if any(strcmp(fields(codeInfoObject.Type), 'Elements'))
 
                 for j=1:numel(codeInfoObject.Type.Elements)
-                    output = coderArgument.processObject(codeInfoObject.Type.Elements(j), mod(j,2), mod(j+1,2));
+                    output = coderArgumentFactory.processObject(codeInfoObject.Type.Elements(j), mod(j,2), mod(j+1,2));
                     output.MATLABName = obj.MATLABName;
 
                     obj.Children = appendCell(obj.Children, output);

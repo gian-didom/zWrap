@@ -17,7 +17,7 @@ classdef (HandleCompatible) coderStructure_legacy < coderArgument
             obj.MATLABType = 'struct';
             if any(strcmp(fields(codeInfoObject.Type), 'Elements'))
                 for j=1:numel(codeInfoObject.Type.Elements)
-                        output = coderArgument.processObject(codeInfoObject.Type.Elements(j), varargin{:});
+                        output = coderArgumentFactory.processObject(codeInfoObject.Type.Elements(j), varargin{:});
                         obj.Children = appendCell(obj.Children, output);
                         
 

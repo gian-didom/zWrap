@@ -2,24 +2,23 @@
 % *CoderBoundedMatrix* is a class that represents a matrix with bounded dimensions.
 % The matrix is defined by a *DataType* and a *SizeType*.
 % The *DataType* defines the type of the elements of the matrix, while the *SizeType* defines the type of the size of the matrix.
-
-%%%% function generateDecoderFunction(obj, accessName, nestLevel)
-
+%% function generateDecoderFunction(obj, accessName, nestLevel)
+%
 % The *generateDecoderFunction* method generates a MATLAB function that decodes the matrix from a byteArray. The information on the size are hardcoded in the function according to the structure returned in the codeInfo.mat object.
 % The output string is appended to the overall decoder function for the specific application.
-
+%
 %%%% Functional description
 % A coderBoundedMatrix object is normally characterized by a |<name>_data| variable and a |<name>_size| one. The first thing to do is to typecast the |_size| object in order to understand the dimensions of the matrix as returned by the function.
-
+%
 % Once this information has been retrieved, according to the type of data contained in the matrix, different operations are performed.
-
+%
 % ** Primitive matrices **
 % In case of primitive matrices, the entire byte array is typecasted to the primitive data type. The resulting vector is then reshaped according to the data_size object and assigned to the output variable. The resulting matrix - when smalled than the specified max size - is padded with zeros.
-
+%
 % ** Non-primitive matrices **
 % In this case, the casting is not trivial and is automatically delegated to the Children BaseType associated object. Before doing that, a for-loop is instantiated to iterate over the maximum number of elements in the matrix. We do not loop on the effective size because the matrix should be padded anyway with zeros; however, we check if the index is smaller than the actual size and assign the value to the output matrix, otherwise no action is performed.
 % In order to manage the variable naming, a random string is generated and passed to the children object. The children object will return the name of the variable that has been used to store the result of the decoding. This name is then used to assign the value to the output matrix.
-
+%
 %% ==============================================================================================
 
 %% function functionScript = generateDecoderFunction(obj, accessName)

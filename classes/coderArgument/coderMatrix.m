@@ -9,6 +9,14 @@ classdef (HandleCompatible) coderMatrix < coderArgument
         BaseType
     end
 
+    methods (Abstract)
+        %% methods(Abstract = true) -------------------------------------------------------
+        %% function generateMATLABFunction(obj, accessName) ===============================
+        generateMATLABFunction(obj, accessName);
+        %% ================================================================================
+
+    end
+
     methods
         function obj = coderMatrix(typeObj)
             obj@coderArgument(typeObj);

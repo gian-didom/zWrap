@@ -29,7 +29,7 @@ classdef (HandleCompatible, Abstract) coderNestedObject < coderArgument
             % Iterate on the Elements
             numChildren = numel(typeObj.Elements);
             for j=1:numChildren
-                output = coderArgument.processObject(typeObj.Elements(j).Type);
+                output = coderArgumentFactory.processObject(typeObj.Elements(j).Type);
                 output.setName(typeObj.Elements(j).Identifier);
                 output.MATLABName = typeObj.Elements(j).Identifier;
                 obj.Children = horzcat(obj.Children, output);

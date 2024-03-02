@@ -15,8 +15,8 @@ classdef (HandleCompatible, Abstract) coderBoundedMatrix < coderMatrix
             obj@coderMatrix(dataObj);
             % All bounded matrices have a dataObj and a sizeObj.
             % obj.Name = codeInfoObj.Identifier;
-            obj.DataType = coderArgument.processObject(dataObj.Type);
-            obj.SizeType = coderArgument.processObject(sizeObj.Type);
+            obj.DataType = coderArgumentFactory.processObject(dataObj.Type);
+            obj.SizeType = coderArgumentFactory.processObject(sizeObj.Type);
 
             obj.BaseType = obj.DataType.BaseType;
             obj.Type = obj.BaseType.Type;
