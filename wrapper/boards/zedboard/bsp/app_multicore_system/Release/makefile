@@ -32,6 +32,7 @@ SD_FILES = --elf ../../$(FUNCTION_NAME)_core0/Release/$(FUNCTION_NAME)_core0.elf
 # primary build targets
 #
 build:
+	-@echo
 	-@echo Building app for core0...
 	cd ../../$(FUNCTION_NAME)_core0/Release && $(MAKE) all
 	-@echo Building app for core1...

@@ -316,7 +316,7 @@ pos_output_parser(4) = pos_output_parser(2) + max(40, 20*numel(oss.Children));
 set_param(sprintf('%s/outputParser', subsystem_path), 'Position', pos_output_parser);
 
 zphoto.Position(1) = pos_output_parser(1);
-zphoto.Position(2) = pos_output_parser(2)-200;
+zphoto.Position(2) = pos_output_parser(2)-800;%pos_output_parser(2)-200;
 zphoto.Position(3:4) = zphoto.Position(1:2) + [40 35]*3.5;
 
 

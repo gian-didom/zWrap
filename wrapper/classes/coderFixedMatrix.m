@@ -318,7 +318,8 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
                     sprintf(']);')));
             else
                 functionScript = vertcat(functionScript, ...
-                    strcat(sprintf("%s = reshape(%s, 1, []);", accessName, arrayName)));
+                    strcat(sprintf("%s = reshape(%s, %i, []);", accessName, arrayName, obj.Dimension)));
+%                     strcat(sprintf("%s = reshape(%s, 1, []);", accessName, arrayName)));
             end
 
             % Increase arrayPointer;

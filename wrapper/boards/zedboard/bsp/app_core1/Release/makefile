@@ -51,13 +51,15 @@ main-build: $(FUNCTION_NAME)_core1.elf secondary-outputs
 
 # Tool invocations
 $(FUNCTION_NAME)_core1.elf: $(OBJS) ../src/lscript.ld $(USER_OBJS)
+	@echo "Current working directory: $(shell pwd)"
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM v7 gcc linker'
-	$(ARM_GPP) -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,--print-memory-usage -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bsplib/lib -o "$(FUNCTION_NAME)_core1.elf" $(OBJS) $(USER_OBJS) $(LIBS) $(USER_COMPILER_FLAGS)
+	$(ARM_GPP) -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,--print-memory-usage -Wl,-build-id=none -specs=Xilinx.spec -specs=nosys.specs -Wl,-T -Wl,../src/lscript.ld -L ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_1/bsplib/lib -o "$(FUNCTION_NAME)_core1.elf" $(OBJS) $(USER_OBJS) $(LIBS) $(USER_COMPILER_FLAGS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 $(FUNCTION_NAME)_core1.elf.size: $(FUNCTION_NAME)_core1.elf
+	@echo "Current working directory: $(shell pwd)"
 	@echo 'Invoking: ARM v7 Print Size'
 	$(ARM_SIZE) $(FUNCTION_NAME)_core1.elf  > "$(FUNCTION_NAME)_core1.elf.size"
 	cat "$(FUNCTION_NAME)_core1.elf.size" || type "$(FUNCTION_NAME)_core1.elf.size"

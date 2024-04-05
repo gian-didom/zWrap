@@ -46,7 +46,10 @@ if not(zSettings.pack)
     if (exist(packDir, 'dir'))
         rmdir(packDir, 's');
     end
-    modifiedpackNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
+%     modifiedpackNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
+%         'minimalHeaders', false, ...
+%         'fileName', zipName);
+    packNGo(fullfile(coder_project_path, 'buildInfo.mat'), ...
         'minimalHeaders', false, ...
         'fileName', zipName);
     unzip(zipName, packDir);
@@ -99,7 +102,7 @@ index_found = arrayfun(@(s) any(strcmp(s.name, vertcat(iss.Children.argNames))),
 codedInputs = codedInputs(index_found);
 
 echo = true;
-[GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, codedOutputs, packDir, echo);
+[GCCInputSize, GCCOutputSize] = getSizeAndOffsetsCpp_v2(buildInfo, codedInputs, compileInfoStruct, codedOutputs, packDir, echo);
 
 
 assert(GCCInputSize == iss.getTotalSizePadded(), "Error: input size mismatch. Try again with the --pack option.");
@@ -234,7 +237,7 @@ for j=1:numel(pathsToRemove)
 end
 
 addpath(genpath(fullfile('boards', boardName)));
-buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
+buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss, compileInfoStruct);
 
 % 8. Move the calling function template to the proper directory
 
@@ -252,24 +255,34 @@ buildProjectDir(iss.fcnName, targetFolderName, packDir, iss, oss);
 % fprintbf('BOOT.bin image succesfully generated at %s\n', bootImagePath);
 
 %% GENERATE INTERFACES
-if (zSettings.nosimulink)
-    fprintbf("Skipping Simulink generation...\n");
-else
+% if (zSettings.nosimulink)
+%     fprintbf("Skipping Simulink generation...\n");
+% else
 fprintbf('Generating Simulink library...')
 SimulinkLibraryPath = fullfile(targetFolderName, 'simulink', sprintf('%s.slx', iss.fcnName));
 generateSimulinkLibrary(iss, oss, SimulinkLibraryPath);
 printDone();
 fprintbf('\nSimulink library succesfully created at %s!\n', SimulinkLibraryPath)
-end
+% end
 
 %% RUN makefiles
 fprintf("Running makefiles...")
 buildVar = 'Release';
-[makeFlag] = system(sprintf("cd %s %s %s", ...
-    fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar), ...
-    cmdsep, ...
-    zEnv.makeBin), ...
-    "-echo");
+
+dir = fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar);
+
+cmd = sprintf("cd %s %s %s", ...
+    dir, ...
+    "&&", ...
+    zEnv.makeBin);
+
+[makeFlag] = system(cmd, "-echo");
+
+% [makeFlag] = system(sprintf("cd %s %s %s", ...
+%     fullfile(targetFolderName, "project", strcat(iss.fcnName, "_multicore_system"), buildVar), ...
+%     cmdsep, ...
+%     zEnv.makeBin), ...
+%     "-echo");
 printDone();
 %% RUN TESTS
 
