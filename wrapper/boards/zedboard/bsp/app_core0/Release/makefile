@@ -51,7 +51,7 @@ main-build: $(FUNCTION_NAME)_core0.elf secondary-outputs
 $(FUNCTION_NAME)_core0.elf: $(OBJS) ../src/lscript.ld $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM v7 gcc linker'
-	$(ARM_GCC) -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,--print-memory-usage -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,.../src/lscript.ld -L ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bsplib/lib -o "$(FUNCTION_NAME)_core0.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(ARM_GCC) -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,--print-memory-usage -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L ../../zed/export/zed/sw/zed/standalone_ps7_cortexa9_0/bsplib/lib -o "$(FUNCTION_NAME)_core0.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
