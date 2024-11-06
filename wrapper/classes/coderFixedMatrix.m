@@ -233,20 +233,31 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
                 % localArray into the ByteArray. This is good to avoid
                 % issue with memory indexes
                 for j=1:numel(outlines)
-                    sides = split(outlines(j), ' = ');
-                    if numel(sides) > numel(outlines(j)) && startsWith(sides{1}, 'byteArray')
-                        rhs = sides{2};
-                        rhs_uncomm = split(rhs, ';');
-                        outlines(j) = sprintf("%s((%s-1)*%i+1:%s*%i) = %s; %s", ...
-                            arrayName, indexLoop, obj.BaseType.PaddedSize, ...
-                            indexLoop, obj.BaseType.PaddedSize, ...
-                            rhs_uncomm{1}, rhs_uncomm{2});
-                    end
-                    outlines(j) = strcat(sprintf("\t"), outlines(j));
-                    % There is no data padding between array elements.
-                    functionScript = vertcat(functionScript, outlines(j));
-
+                    tempByteArrayName = sprintf("byteArray_%s", arrayName);
+                    outlines(j) = strrep(outlines(j), "byteArray", tempByteArrayName);
+                    % sides = split(outlines(j), ' = ');
+                    % if numel(sides) > numel(outlines(j)) && startsWith(sides{1}, 'byteArray')
+                    %     % This is a byteArray ... = ... kind of line
+                    %     rhs = sides{2};
+                    %     rhs_uncomm = split(rhs, ';');
+                    %     outlines(j) = sprintf("%s((%s-1)*%i+1:%s*%i) = %s; %s", ...
+                    %         arrayName, indexLoop, obj.BaseType.PaddedSize, ...
+                    %         indexLoop, obj.BaseType.PaddedSize, ...
+                    %         rhs_uncomm{1}, rhs_uncomm{2});
+                    % end
                 end
+                outlines = vertcat( ...
+                    sprintf("%s = uint8(zeros(%i, 1));", tempByteArrayName, obj.BaseType.PaddedSize), ...
+                    outlines, ...
+                    sprintf("%s((%s-1)*%i+1:%s*%i) = %s;", ...
+                    arrayName, indexLoop, obj.BaseType.PaddedSize, ...
+                    indexLoop, obj.BaseType.PaddedSize, ...
+                    tempByteArrayName));
+                % outlines(j) = strcat(sprintf("\t"), outlines(j));
+                % There is no data padding between array elements.
+                functionScript = vertcat(functionScript, outlines);
+
+
                 functionScript = vertcat(functionScript, sprintf("end"));
 
                 functionScript = vertcat(functionScript, sprintf("byteArray(%i:%i+numel(%s)) = %s; %%%i\n", ...
@@ -331,8 +342,8 @@ classdef (HandleCompatible) coderFixedMatrix < coderMatrix
         end
 
         %% function castType = getCastType(obj)
-         function castType = getCastType(obj)
+        function castType = getCastType(obj)
             castType = obj.BaseType.MATLABCastType;
-         end
+        end
     end
 end

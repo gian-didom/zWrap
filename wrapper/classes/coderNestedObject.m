@@ -129,9 +129,12 @@ classdef (HandleCompatible, Abstract) coderNestedObject < coderArgument
             %   Detailed explanation goes here
             if strcmp(inobj.Identifier(1:4), 'cell')
                 outClass = @coderHeterogeneousCell;
+            elseif (isa(inobj, "coder.types.Class"))
+                outClass = coderClass.disambiguate(inobj);
             elseif strcmp(inobj.Identifier(1:6), 'struct') || isa(inobj, "coder.types.Struct")
                 outClass = @coderStructure;
             else % It should be a class
+                warning("Unhandled case");
                 outClass = coderClass.disambiguate(inobj);
             end
         end
