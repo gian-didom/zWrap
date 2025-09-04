@@ -60,3 +60,5 @@ Future works foresee the creation of an entire Vitis project, in order to use zW
 
 # Disclaimer
 zWrap is currently looking for test cases to be validated. Feel free to reach out to gianfranco.didomenico@polimi.it if you are interested in using zWrap to deploy your code.
+zWrap has been developed in the context of the EXTREMA ERC project. This project has received funding from the European Research Council (ERC) under the European Union’s Horizon 2020 research and innovation programme (grant agreement No. 864697).
+
